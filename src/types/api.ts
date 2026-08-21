@@ -79,6 +79,7 @@ export interface LoginResponse {
 // ----- Uploads -----
 
 export interface UploadedFile {
+  _id: string
   filename: string
   originalName: string
   mimetype: string

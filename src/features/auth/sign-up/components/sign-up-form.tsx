@@ -1,148 +1,144 @@
-import { useState } from 'react'
 import { z } from 'zod'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { Loader2, UserPlus } from 'lucide-react'
-import { toast } from 'sonner'
-import { IconFacebook, IconGithub } from '@/assets/brand-icons'
-import { sleep, cn } from '@/lib/utils'
-import { Button } from '@/components/ui/button'
+import { useRegister } from '@/hooks/use-auth'
+import { getApiErrorMessage, getApiFieldErrors } from '@/lib/api-client'
+import { cn } from '@/lib/utils'
+import { Form } from '@/components/ui/form'
 import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from '@/components/ui/form'
-import { Input } from '@/components/ui/input'
-import { PasswordInput } from '@/components/password-input'
+  AuthDivider,
+  AuthFormError,
+  AuthGoogleButton,
+  AuthSubmitButton,
+} from '../../components/auth-actions'
+import { AuthPasswordField, AuthTextField } from '../../components/auth-fields'
+import { AUTH_FORM_GAP } from '../../components/auth-styles'
 
-const formSchema = z
-  .object({
-    email: z.email({
-      error: (iss) =>
-        iss.input === '' ? 'Please enter your email.' : undefined,
-    }),
-    password: z
-      .string()
-      .min(1, 'Please enter your password.')
-      .min(7, 'Password must be at least 7 characters long.'),
-    confirmPassword: z.string().min(1, 'Please confirm your password.'),
-  })
-  .refine((data) => data.password === data.confirmPassword, {
-    message: "Passwords don't match.",
-    path: ['confirmPassword'],
-  })
+/**
+ * Fields, labels and placeholders come from the Figma `Form` node (809:615):
+ * Full name, Email, Password — one column, 14px apart. Mirrors the backend
+ * contract in auth.validation.ts (registerSchema).
+ */
+const formSchema = z.object({
+  name: z
+    .string()
+    .trim()
+    .min(1, 'Please enter your full name.')
+    .min(2, 'Your name must be at least 2 characters.')
+    .max(120, 'Your name is too long.'),
+  email: z.email({
+    error: (iss) =>
+      iss.input === ''
+        ? 'Please enter your email.'
+        : 'Enter a valid email address.',
+  }),
+  password: z
+    .string()
+    .min(1, 'Please enter your password.')
+    .min(8, 'Password must be at least 8 characters.'),
+})
+
+type SignUpValues = z.infer<typeof formSchema>
+
+const FIELD_NAMES = ['name', 'email', 'password'] as const
+
+function isFieldName(value: string): value is keyof SignUpValues {
+  return (FIELD_NAMES as readonly string[]).includes(value)
+}
 
 export function SignUpForm({
   className,
   ...props
 }: React.HTMLAttributes<HTMLFormElement>) {
-  const [isLoading, setIsLoading] = useState(false)
+  const register = useRegister()
 
-  const form = useForm<z.infer<typeof formSchema>>({
+  const form = useForm<SignUpValues>({
     resolver: zodResolver(formSchema),
-    defaultValues: {
-      email: '',
-      password: '',
-      confirmPassword: '',
-    },
+    defaultValues: { name: '', email: '', password: '' },
   })
 
-  function onSubmit(data: z.infer<typeof formSchema>) {
-    setIsLoading(true)
+  // Stays disabled through the post-success redirect so the form cannot be
+  // submitted twice.
+  const isSubmitting = register.isPending || register.isSuccess
 
-    toast.promise(sleep(2000), {
-      loading: 'Creating account...',
-      success: () => {
-        setIsLoading(false)
-        return `Account created for ${data.email}.`
+  function onSubmit(values: SignUpValues) {
+    if (isSubmitting) return
+
+    form.clearErrors('root')
+    register.mutate(values, {
+      onError: (error) => {
+        // Attach backend validation details (e.g. duplicate email) to the
+        // matching input; anything unmapped falls back to a form-level message.
+        const fieldErrors = getApiFieldErrors(error).filter((detail) =>
+          isFieldName(detail.field)
+        )
+
+        for (const detail of fieldErrors) {
+          form.setError(detail.field as keyof SignUpValues, {
+            message: detail.message,
+          })
+        }
+
+        if (fieldErrors.length === 0) {
+          form.setError('root', {
+            message: getApiErrorMessage(
+              error,
+              'We could not create your account. Please try again.'
+            ),
+          })
+        }
       },
-      error: 'Error',
     })
   }
+
+  const rootError = form.formState.errors.root?.message
 
   return (
     <Form {...form}>
       <form
         onSubmit={form.handleSubmit(onSubmit)}
-        className={cn('grid gap-3', className)}
+        noValidate
+        className={cn('flex w-full flex-col', AUTH_FORM_GAP, className)}
         {...props}
       >
-        <FormField
-          control={form.control}
+        <AuthTextField<SignUpValues>
+          name='name'
+          label='Full name'
+          placeholder='Enter your full name'
+          autoComplete='name'
+          disabled={isSubmitting}
+        />
+
+        <AuthTextField<SignUpValues>
           name='email'
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Email</FormLabel>
-              <FormControl>
-                <Input placeholder='name@example.com' {...field} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
+          label='Email'
+          type='email'
+          inputMode='email'
+          placeholder='Enter your email address'
+          autoComplete='email'
+          disabled={isSubmitting}
         />
-        <FormField
-          control={form.control}
+
+        <AuthPasswordField<SignUpValues>
           name='password'
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Password</FormLabel>
-              <FormControl>
-                <PasswordInput placeholder='********' {...field} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
+          label='Password'
+          placeholder='Create a password'
+          autoComplete='new-password'
+          disabled={isSubmitting}
         />
-        <FormField
-          control={form.control}
-          name='confirmPassword'
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Confirm Password</FormLabel>
-              <FormControl>
-                <PasswordInput placeholder='********' {...field} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-        <Button className='mt-2' disabled={isLoading}>
-          {isLoading ? <Loader2 className='animate-spin' /> : <UserPlus />}
-          Create Account
-        </Button>
 
-        <div className='relative my-2'>
-          <div className='absolute inset-0 flex items-center'>
-            <span className='w-full border-t' />
-          </div>
-          <div className='relative flex justify-center text-xs uppercase'>
-            <span className='bg-background px-2 text-muted-foreground'>
-              Or continue with
-            </span>
-          </div>
-        </div>
+        {rootError && <AuthFormError message={rootError} />}
 
-        <div className='grid grid-cols-2 gap-2'>
-          <Button
-            variant='outline'
-            className='w-full'
-            type='button'
-            disabled={isLoading}
-          >
-            <IconGithub className='h-4 w-4' /> GitHub
-          </Button>
-          <Button
-            variant='outline'
-            className='w-full'
-            type='button'
-            disabled={isLoading}
-          >
-            <IconFacebook className='h-4 w-4' /> Facebook
-          </Button>
-        </div>
+        <AuthSubmitButton
+          isPending={isSubmitting}
+          pendingLabel='Creating account…'
+        >
+          Create account
+        </AuthSubmitButton>
+
+        <AuthDivider />
+
+        <AuthGoogleButton label='Continue with Google' />
       </form>
     </Form>
   )

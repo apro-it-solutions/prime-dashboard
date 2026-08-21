@@ -1,54 +1,102 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { render, type RenderResult } from 'vitest-browser-react'
-import { userEvent, type Locator } from 'vitest/browser'
+import { type Locator, userEvent } from 'vitest/browser'
 import { ForgotPasswordForm } from './forgot-password-form'
 
-const navigateMock = vi.fn()
+const SUCCESS_MESSAGE = 'If the email exists, a reset link has been sent'
 
-vi.mock('@tanstack/react-router', async (orig) => {
-  const actual = await orig<typeof import('@tanstack/react-router')>()
-  return { ...actual, useNavigate: () => navigateMock }
-})
+const mutate = vi.hoisted(() => vi.fn())
+const state = vi.hoisted(() => ({
+  isPending: false,
+  isSuccess: false,
+  data: undefined as { message: string } | undefined,
+}))
 
-vi.mock('@/lib/utils', async (orig) => ({
-  ...(await orig()),
-  sleep: vi.fn(() => Promise.resolve()),
+vi.mock('@/hooks/use-auth', () => ({
+  useForgotPassword: () => ({
+    mutate,
+    isPending: state.isPending,
+    isSuccess: state.isSuccess,
+    data: state.data,
+  }),
 }))
 
 describe('ForgotPasswordForm', () => {
   let screen: RenderResult
-  let emailInput: Locator
-  let continueButton: Locator
+  let email: Locator
+  let submitButton: Locator
 
-  beforeEach(async () => {
-    vi.clearAllMocks()
-
+  const mount = async () => {
     screen = await render(<ForgotPasswordForm />)
-    emailInput = screen.getByRole('textbox', { name: /^Email$/i })
-    continueButton = screen.getByRole('button', { name: /^Continue$/i })
+    email = screen.getByRole('textbox', { name: /^Email$/i })
+    // The label swaps to "Sending…" while the request is in flight.
+    submitButton = screen.getByRole('button', { name: /^(Send reset link|Sending)/i })
+  }
+
+  beforeEach(() => {
+    vi.clearAllMocks()
+    state.isPending = false
+    state.isSuccess = false
+    state.data = undefined
   })
 
-  it('renders email field and continue button', async () => {
-    await expect.element(emailInput).toBeInTheDocument()
-    await expect.element(continueButton).toBeInTheDocument()
+  it('renders only the email field and the submit button', async () => {
+    await mount()
+
+    await expect.element(email).toBeInTheDocument()
+    await expect.element(submitButton).toBeInTheDocument()
+    expect(screen.container.querySelectorAll('input')).toHaveLength(1)
+    // The design has no Google button or divider on this screen.
+    expect(screen.container.textContent).not.toMatch(/Continue with Google|\bOR\b/)
   })
 
-  it('shows validation when submitting empty form', async () => {
-    await userEvent.click(continueButton)
+  it('requires an email', async () => {
+    await mount()
+
+    await userEvent.click(submitButton)
+
     await expect
-      .element(screen.getByText(/^Please enter your email\.$/i))
+      .element(screen.getByText('Please enter your email.'))
       .toBeInTheDocument()
+    expect(mutate).not.toHaveBeenCalled()
   })
 
-  it('resets the form and navigates to /otp on success', async () => {
-    await userEvent.fill(emailInput, 'a@b.com')
-    await userEvent.click(continueButton)
+  it('rejects a malformed email', async () => {
+    await mount()
+    await userEvent.fill(email, 'not-an-email')
 
-    await vi.waitFor(() =>
-      expect(navigateMock).toHaveBeenCalledWith({ to: '/otp' })
-    )
+    await userEvent.click(submitButton)
 
-    // Form should reset on success
-    await expect.element(emailInput).toHaveValue('')
+    await expect
+      .element(screen.getByText('Enter a valid email address.'))
+      .toBeInTheDocument()
+    expect(mutate).not.toHaveBeenCalled()
+  })
+
+  it('submits the email to the forgot-password mutation', async () => {
+    await mount()
+    await userEvent.fill(email, 'a@b.com')
+
+    await userEvent.click(submitButton)
+
+    await vi.waitFor(() => expect(mutate).toHaveBeenCalledOnce())
+    expect(mutate.mock.calls[0][0]).toBe('a@b.com')
+  })
+
+  it("shows the API's own wording on success, without claiming the account exists", async () => {
+    state.isSuccess = true
+    state.data = { message: SUCCESS_MESSAGE }
+    await mount()
+
+    await expect
+      .element(screen.getByRole('status'))
+      .toHaveTextContent(SUCCESS_MESSAGE)
+  })
+
+  it('disables the submit button while the request is in flight', async () => {
+    state.isPending = true
+    await mount()
+
+    await expect.element(submitButton).toBeDisabled()
   })
 })

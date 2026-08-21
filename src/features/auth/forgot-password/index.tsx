@@ -1,44 +1,23 @@
-import { Link } from '@tanstack/react-router'
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from '@/components/ui/card'
-import { AuthLayout } from '../auth-layout'
+import { AuthBackRow } from '../components/auth-actions'
+import { AuthShell } from '../components/auth-shell'
 import { ForgotPasswordForm } from './components/forgot-password-form'
 
+/**
+ * Forgot password screen (Figma: prime-NMS, node 809:571).
+ *
+ * Same frame, palette and controls as the Sign In (800:553) and Create account
+ * (809:535) designs. The design's only navigation is the "Back to sign in" row —
+ * no Google button, no sign-up link.
+ */
 export function ForgotPassword() {
   return (
-    <AuthLayout>
-      <Card className='max-w-sm gap-4 sm:min-w-sm'>
-        <CardHeader>
-          <CardTitle className='text-lg tracking-tight'>
-            Forgot Password
-          </CardTitle>
-          <CardDescription>
-            Enter your registered email and <br /> we will send you a link to
-            reset your password.
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <ForgotPasswordForm />
-        </CardContent>
-        <CardFooter>
-          <p className='mx-auto px-8 text-center text-sm text-balance text-muted-foreground'>
-            Don't have an account?{' '}
-            <Link
-              to='/sign-up'
-              className='underline underline-offset-4 hover:text-primary'
-            >
-              Sign up
-            </Link>
-            .
-          </p>
-        </CardFooter>
-      </Card>
-    </AuthLayout>
+    <AuthShell
+      title='Forgot password?'
+      subtitle="Enter your email and we'll send you a reset link."
+      glow={{ left: 1084, top: 231 }}
+      footer={<AuthBackRow to='/sign-in'>Back to sign in</AuthBackRow>}
+    >
+      <ForgotPasswordForm />
+    </AuthShell>
   )
 }

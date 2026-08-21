@@ -3,7 +3,11 @@ import axios, {
   type AxiosRequestConfig,
   type InternalAxiosRequestConfig,
 } from 'axios'
-import { type ApiEnvelope, type LoginResponse } from '@/types/api'
+import {
+  type ApiEnvelope,
+  type ApiErrorBody,
+  type LoginResponse,
+} from '@/types/api'
 import { useAuthStore } from '@/stores/auth-store'
 
 const BASE_URL = import.meta.env.VITE_API_URL ?? 'http://localhost:5001/api/v1'
@@ -61,7 +65,10 @@ apiClient.interceptors.response.use(
     const url = original?.url ?? ''
 
     // Only try to refresh on a 401 that isn't itself an auth call, once.
-    const isAuthCall = url.includes('/auth/login') || url.includes('/auth/refresh')
+    const isAuthCall =
+      url.includes('/auth/login') ||
+      url.includes('/auth/register') ||
+      url.includes('/auth/refresh')
     if (status === 401 && original && !original._retry && !isAuthCall) {
       original._retry = true
 
@@ -87,6 +94,24 @@ apiClient.interceptors.response.use(
     return Promise.reject(error)
   }
 )
+
+/**
+ * Extract the backend's per-field validation details from an axios error.
+ * The API returns `{ errors: [{ field, message }] }` for 400/409 responses,
+ * which lets a form attach the message to the offending input.
+ */
+export function getApiFieldErrors(
+  error: unknown
+): { field: string; message: string }[] {
+  if (!(error instanceof AxiosError)) return []
+  const body = error.response?.data as ApiErrorBody | undefined
+  if (!Array.isArray(body?.errors)) return []
+  return body.errors.flatMap((detail) =>
+    detail?.field && detail?.message
+      ? [{ field: detail.field, message: detail.message }]
+      : []
+  )
+}
 
 /** Extract a human-readable message from an axios error's response body. */
 export function getApiErrorMessage(error: unknown, fallback = 'Something went wrong'): string {

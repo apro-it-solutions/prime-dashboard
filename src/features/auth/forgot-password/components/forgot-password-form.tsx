@@ -1,79 +1,102 @@
-import { useState } from 'react'
 import { z } from 'zod'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { useNavigate } from '@tanstack/react-router'
-import { ArrowRight, Loader2 } from 'lucide-react'
-import { toast } from 'sonner'
-import { sleep, cn } from '@/lib/utils'
-import { Button } from '@/components/ui/button'
+import { useForgotPassword } from '@/hooks/use-auth'
+import { getApiErrorMessage, getApiFieldErrors } from '@/lib/api-client'
+import { cn } from '@/lib/utils'
+import { Form } from '@/components/ui/form'
 import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from '@/components/ui/form'
-import { Input } from '@/components/ui/input'
+  AuthFormError,
+  AuthFormSuccess,
+  AuthSubmitButton,
+} from '../../components/auth-actions'
+import { AuthTextField } from '../../components/auth-fields'
+import { AUTH_FORM_GAP } from '../../components/auth-styles'
 
+/**
+ * Figma `Form` node (809:652): a single Email field then the primary button.
+ * No divider, no social buttons.
+ */
 const formSchema = z.object({
   email: z.email({
-    error: (iss) => (iss.input === '' ? 'Please enter your email.' : undefined),
+    error: (iss) =>
+      iss.input === ''
+        ? 'Please enter your email.'
+        : 'Enter a valid email address.',
   }),
 })
+
+type ForgotPasswordValues = z.infer<typeof formSchema>
 
 export function ForgotPasswordForm({
   className,
   ...props
 }: React.HTMLAttributes<HTMLFormElement>) {
-  const navigate = useNavigate()
-  const [isLoading, setIsLoading] = useState(false)
+  const forgotPassword = useForgotPassword()
 
-  const form = useForm<z.infer<typeof formSchema>>({
+  const form = useForm<ForgotPasswordValues>({
     resolver: zodResolver(formSchema),
     defaultValues: { email: '' },
   })
 
-  function onSubmit(data: z.infer<typeof formSchema>) {
-    setIsLoading(true)
+  const isSubmitting = forgotPassword.isPending
 
-    toast.promise(sleep(2000), {
-      loading: 'Sending email...',
-      success: () => {
-        setIsLoading(false)
-        form.reset()
-        navigate({ to: '/otp' })
-        return `Email sent to ${data.email}`
+  function onSubmit(values: ForgotPasswordValues) {
+    if (isSubmitting) return
+
+    form.clearErrors('root')
+    forgotPassword.mutate(values.email, {
+      onError: (error) => {
+        const fieldError = getApiFieldErrors(error).find(
+          (detail) => detail.field === 'email'
+        )
+
+        if (fieldError) {
+          form.setError('email', { message: fieldError.message })
+          return
+        }
+
+        form.setError('root', {
+          message: getApiErrorMessage(
+            error,
+            'We could not send the reset link. Please try again.'
+          ),
+        })
       },
-      error: 'Error',
     })
   }
+
+  const rootError = form.formState.errors.root?.message
+  // The API answers 200 for unknown emails too, so this confirms the request
+  // was accepted — not that an account exists. Show its wording verbatim.
+  const successMessage = forgotPassword.isSuccess
+    ? forgotPassword.data.message
+    : null
 
   return (
     <Form {...form}>
       <form
         onSubmit={form.handleSubmit(onSubmit)}
-        className={cn('grid gap-2', className)}
+        noValidate
+        className={cn('flex w-full flex-col', AUTH_FORM_GAP, className)}
         {...props}
       >
-        <FormField
-          control={form.control}
+        <AuthTextField<ForgotPasswordValues>
           name='email'
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Email</FormLabel>
-              <FormControl>
-                <Input placeholder='name@example.com' {...field} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
+          label='Email'
+          type='email'
+          inputMode='email'
+          placeholder='Enter your email address'
+          autoComplete='email'
+          disabled={isSubmitting}
         />
-        <Button className='mt-2' disabled={isLoading}>
-          Continue
-          {isLoading ? <Loader2 className='animate-spin' /> : <ArrowRight />}
-        </Button>
+
+        {successMessage && <AuthFormSuccess message={successMessage} />}
+        {rootError && <AuthFormError message={rootError} />}
+
+        <AuthSubmitButton isPending={isSubmitting} pendingLabel='Sending…'>
+          Send reset link
+        </AuthSubmitButton>
       </form>
     </Form>
   )

@@ -1,38 +1,27 @@
-import { Link, useSearch } from '@tanstack/react-router'
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from '@/components/ui/card'
-import { AuthLayout } from '../auth-layout'
-import { UserAuthForm } from './components/user-auth-form'
+import { useSearch } from '@tanstack/react-router'
+import { AuthShell } from '../components/auth-shell'
+import { SignInForm } from './components/sign-in-form'
 
+/**
+ * Sign In screen (Figma: prime-NMS, node 800:553).
+ *
+ * Shares its frame, palette and controls with the Create account design
+ * (809:535) via the components in `features/auth/components`.
+ *
+ * The design's footer ("Don't have an account? Sign up") was dropped by request,
+ * so the card ends after the form. `AuthShell` renders no footer element when
+ * the prop is omitted — there is no empty container or residual gap left behind.
+ */
 export function SignIn() {
   const { redirect } = useSearch({ from: '/(auth)/sign-in' })
 
   return (
-    <AuthLayout>
-      <Card className='max-w-sm gap-4'>
-        <CardHeader>
-          <CardTitle className='text-lg tracking-tight'>Sign in</CardTitle>
-          <CardDescription>
-            Enter your email and password below to log into{' '}
-            <br className='max-sm:hidden' /> your account. Don't have an
-            account?{' '}
-            <Link
-              to='/sign-up'
-              className='text-nowrap underline underline-offset-4 hover:text-primary'
-            >
-              Sign Up
-            </Link>
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <UserAuthForm redirectTo={redirect} />
-        </CardContent>
-      </Card>
-    </AuthLayout>
+    <AuthShell
+      title='Sign In'
+      subtitle='Please enter your details to sign in.'
+      glow={{ left: 1101, top: 132 }}
+    >
+      <SignInForm redirectTo={redirect} />
+    </AuthShell>
   )
 }

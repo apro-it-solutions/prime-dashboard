@@ -1,88 +1,149 @@
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { render, type RenderResult } from 'vitest-browser-react'
 import { type Locator, userEvent } from 'vitest/browser'
 import { SignUpForm } from './sign-up-form'
 
 const FORM_MESSAGES = {
+  nameEmpty: 'Please enter your full name.',
   emailEmpty: 'Please enter your email.',
+  emailInvalid: 'Enter a valid email address.',
   passwordEmpty: 'Please enter your password.',
-  confirmPasswordEmpty: 'Please confirm your password.',
-  passwordMismatch: "Passwords don't match.",
+  passwordTooShort: 'Password must be at least 8 characters.',
 } as const
 
-const toastPromise = vi.hoisted(() =>
-  vi.fn((p: Promise<unknown>, opts: { success?: () => unknown }) => {
-    p.then(() => opts.success?.())
-  })
-)
+const VALID = {
+  name: 'Jane Doe',
+  email: 'jane@example.com',
+  password: 'Str0ng@Pass',
+} as const
 
-vi.mock('sonner', () => ({ toast: { promise: toastPromise } }))
+const mutate = vi.hoisted(() => vi.fn())
+const registerState = vi.hoisted(() => ({ isPending: false, isSuccess: false }))
+
+vi.mock('@/hooks/use-auth', () => ({
+  useRegister: () => ({
+    mutate,
+    isPending: registerState.isPending,
+    isSuccess: registerState.isSuccess,
+  }),
+}))
 
 describe('SignUpForm', () => {
   let screen: RenderResult
-  let emailInput: Locator
-  let passwordInput: Locator
-  let confirmPasswordInput: Locator
+  let name: Locator
+  let email: Locator
+  let password: Locator
   let submitButton: Locator
 
-  beforeEach(async () => {
-    vi.clearAllMocks()
-
+  const mount = async () => {
     screen = await render(<SignUpForm />)
-    emailInput = screen.getByRole('textbox', { name: /^Email$/i })
-    passwordInput = screen.getByLabelText(/^Password$/i)
-    confirmPasswordInput = screen.getByLabelText(/^Confirm Password$/i)
-    submitButton = screen.getByRole('button', { name: /^Create Account$/i })
+    name = screen.getByRole('textbox', { name: /^Full name$/i })
+    email = screen.getByRole('textbox', { name: /^Email$/i })
+    password = screen.getByLabelText(/^Password$/i)
+    // The label swaps to "Creating account…" while the request is in flight.
+    submitButton = screen.getByRole('button', { name: /^Creat(e|ing) account/i })
+  }
+
+  const fillValid = async () => {
+    await userEvent.fill(name, VALID.name)
+    await userEvent.fill(email, VALID.email)
+    await userEvent.fill(password, VALID.password)
+  }
+
+  // Each test mounts explicitly so the "disabled" cases can set the mutation
+  // state before the first render.
+  beforeEach(() => {
+    vi.clearAllMocks()
+    registerState.isPending = false
+    registerState.isSuccess = false
   })
 
-  afterEach(() => {
-    vi.useRealTimers()
+  it('renders the three fields from the design, and no others', async () => {
+    await mount()
+
+    for (const field of [name, email, password, submitButton]) {
+      await expect.element(field).toBeInTheDocument()
+    }
+    // The design has no confirm-password / phone / split-name fields.
+    expect(screen.container.querySelectorAll('input')).toHaveLength(3)
   })
 
-  it('renders fields and submit button', async () => {
-    await expect.element(emailInput).toBeInTheDocument()
-    await expect.element(passwordInput).toBeInTheDocument()
-    await expect.element(confirmPasswordInput).toBeInTheDocument()
-    await expect.element(submitButton).toBeInTheDocument()
+  it('shows a validation message for every required field', async () => {
+    await mount()
+
+    await userEvent.click(submitButton)
+
+    for (const message of [
+      FORM_MESSAGES.nameEmpty,
+      FORM_MESSAGES.emailEmpty,
+      FORM_MESSAGES.passwordEmpty,
+    ]) {
+      await expect.element(screen.getByText(message)).toBeInTheDocument()
+    }
+    expect(mutate).not.toHaveBeenCalled()
   })
 
-  it('shows validation messages when submitting empty form', async () => {
+  it('rejects a malformed email', async () => {
+    await mount()
+    await fillValid()
+    await userEvent.fill(email, 'not-an-email')
+
     await userEvent.click(submitButton)
 
     await expect
-      .element(screen.getByText(FORM_MESSAGES.emailEmpty))
+      .element(screen.getByText(FORM_MESSAGES.emailInvalid))
       .toBeInTheDocument()
-    await expect
-      .element(screen.getByText(FORM_MESSAGES.passwordEmpty))
-      .toBeInTheDocument()
-    await expect
-      .element(screen.getByText(FORM_MESSAGES.confirmPasswordEmpty))
-      .toBeInTheDocument()
+    expect(mutate).not.toHaveBeenCalled()
   })
 
-  it('shows a mismatch error when passwords do not match', async () => {
-    await userEvent.fill(emailInput, 'a@b.com')
-    await userEvent.fill(passwordInput, '1234567')
-    await userEvent.fill(confirmPasswordInput, '7654321')
+  it('rejects a password shorter than the backend minimum', async () => {
+    await mount()
+    await fillValid()
+    await userEvent.fill(password, 'short7')
 
     await userEvent.click(submitButton)
+
     await expect
-      .element(screen.getByText(FORM_MESSAGES.passwordMismatch))
+      .element(screen.getByText(FORM_MESSAGES.passwordTooShort))
       .toBeInTheDocument()
+    expect(mutate).not.toHaveBeenCalled()
   })
 
-  it('disables submit while submitting and re-enables after timeout', async () => {
-    vi.useFakeTimers()
-
-    await userEvent.fill(emailInput, 'a@b.com')
-    await userEvent.fill(passwordInput, '1234567')
-    await userEvent.fill(confirmPasswordInput, '1234567')
+  it('submits trimmed values once the form is valid', async () => {
+    await mount()
+    await fillValid()
+    await userEvent.fill(name, '  Jane Doe  ')
 
     await userEvent.click(submitButton)
+
+    await vi.waitFor(() => expect(mutate).toHaveBeenCalledOnce())
+    expect(mutate.mock.calls[0][0]).toEqual(VALID)
+  })
+
+  it('toggles password visibility, starting hidden', async () => {
+    await mount()
+
+    await expect.element(password).toHaveAttribute('type', 'password')
+
+    const toggle = screen.getByRole('button', { name: /show password/i })
+    await userEvent.click(toggle)
+    await expect.element(password).toHaveAttribute('type', 'text')
+
+    await userEvent.click(screen.getByRole('button', { name: /hide password/i }))
+    await expect.element(password).toHaveAttribute('type', 'password')
+  })
+
+  it('disables the submit button while the request is in flight', async () => {
+    registerState.isPending = true
+    await mount()
+
     await expect.element(submitButton).toBeDisabled()
+  })
 
-    await vi.advanceTimersByTimeAsync(2000)
-    await expect.element(submitButton).toBeEnabled()
-    expect(toastPromise).toHaveBeenCalledOnce()
+  it('keeps the submit button disabled after success, through the redirect', async () => {
+    registerState.isSuccess = true
+    await mount()
+
+    await expect.element(submitButton).toBeDisabled()
   })
 })
