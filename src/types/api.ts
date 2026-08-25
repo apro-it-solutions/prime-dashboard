@@ -128,6 +128,31 @@ export interface CategoryRef {
   slug: string
 }
 
+// ----- Project category -----
+//
+// Projects have their own category collection, completely separate from the
+// Category type above (which serves products and blogs). A category created for
+// a blog never appears in the project dropdown, and vice versa.
+
+export interface ProjectCategory {
+  _id: string
+  name: string
+  slug: string
+  description?: string
+  status: CategoryStatus
+  /** Number of projects referencing this category (attached by the list endpoint). */
+  projectCount?: number
+  createdAt: string
+  updatedAt: string
+}
+
+export interface ProjectCategoryInput {
+  name: string
+  slug?: string
+  description?: string
+  status?: CategoryStatus
+}
+
 // ----- Product -----
 
 export interface Product {
@@ -156,6 +181,49 @@ export interface ProductInput {
   gallery?: string[]
   status?: ContentStatus
   featured?: boolean
+  seo?: SeoMeta
+}
+
+// ----- Project -----
+
+export interface Project {
+  _id: string
+  title: string
+  slug: string
+  shortDescription?: string
+  description?: string
+  featuredImage?: string
+  gallery: string[]
+  category: CategoryRef | string | null
+  client?: string
+  location?: string
+  completionDate?: string
+  technologies: string[]
+  projectUrl?: string
+  status: ContentStatus
+  featured: boolean
+  sortOrder: number
+  seo?: SeoMeta
+  createdAt: string
+  updatedAt: string
+}
+
+export interface ProjectInput {
+  title: string
+  slug?: string
+  shortDescription?: string
+  description?: string
+  featuredImage?: string
+  gallery?: string[]
+  category: string
+  client?: string
+  location?: string
+  completionDate?: string
+  technologies?: string[]
+  projectUrl?: string
+  status?: ContentStatus
+  featured?: boolean
+  sortOrder?: number
   seo?: SeoMeta
 }
 
@@ -254,12 +322,18 @@ export interface DashboardStats {
     totalCategories: number
   }
   recentBlogs: Array<
-    Pick<Blog, '_id' | 'title' | 'slug' | 'status' | 'publishDate' | 'createdAt'> & {
+    Pick<
+      Blog,
+      '_id' | 'title' | 'slug' | 'status' | 'publishDate' | 'createdAt'
+    > & {
       category?: CategoryRef | null
     }
   >
   recentMessages: Array<
-    Pick<ContactMessage, '_id' | 'name' | 'email' | 'subject' | 'isRead' | 'createdAt'>
+    Pick<
+      ContactMessage,
+      '_id' | 'name' | 'email' | 'subject' | 'isRead' | 'createdAt'
+    >
   >
 }
 
@@ -298,7 +372,9 @@ export interface HomePage {
   updatedAt?: string
 }
 
-export type HomePageInput = Partial<Omit<HomePage, '_id' | 'createdAt' | 'updatedAt'>>
+export type HomePageInput = Partial<
+  Omit<HomePage, '_id' | 'createdAt' | 'updatedAt'>
+>
 
 // ----- About CMS -----
 
@@ -346,7 +422,9 @@ export interface AboutPage {
   updatedAt?: string
 }
 
-export type AboutPageInput = Partial<Omit<AboutPage, '_id' | 'createdAt' | 'updatedAt'>>
+export type AboutPageInput = Partial<
+  Omit<AboutPage, '_id' | 'createdAt' | 'updatedAt'>
+>
 
 // ----- Settings -----
 
@@ -373,4 +451,6 @@ export interface Settings {
   updatedAt?: string
 }
 
-export type SettingsInput = Partial<Omit<Settings, '_id' | 'createdAt' | 'updatedAt'>>
+export type SettingsInput = Partial<
+  Omit<Settings, '_id' | 'createdAt' | 'updatedAt'>
+>

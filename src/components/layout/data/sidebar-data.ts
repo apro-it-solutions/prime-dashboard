@@ -1,6 +1,7 @@
 import {
   LayoutDashboard,
   Package,
+  FolderKanban,
   FolderTree,
   Newspaper,
   Quote,
@@ -40,6 +41,16 @@ export const sidebarData: SidebarData = {
           title: 'Products',
           url: '/products',
           icon: Package,
+        },
+        {
+          // Collapsible: project categories are managed inside the Projects
+          // section, separately from the shared product/blog categories below.
+          title: 'Projects',
+          icon: FolderKanban,
+          items: [
+            { title: 'All Projects', url: '/projects' },
+            { title: 'Project Categories', url: '/projects/categories' },
+          ],
         },
         {
           title: 'Categories',
