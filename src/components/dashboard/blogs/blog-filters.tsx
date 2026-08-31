@@ -1,4 +1,4 @@
-import { type Category } from '@/types/api'
+import { type BlogCategory } from '@/types/api'
 import {
   Select,
   SelectContent,
@@ -12,7 +12,8 @@ export const CATEGORY_ALL = 'all'
 export type BlogSort = 'latest' | 'oldest'
 
 type BlogFiltersProps = {
-  categories: Category[]
+  /** Blog-only categories, not the product or project ones. */
+  categories: BlogCategory[]
   status: string
   category: string
   sort: BlogSort

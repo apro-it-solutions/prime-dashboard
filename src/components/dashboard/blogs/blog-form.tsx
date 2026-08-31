@@ -1,8 +1,8 @@
 import { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { Loader2, Save, Send } from 'lucide-react'
-import { type BlogInput, type Category } from '@/types/api'
+import { Loader2, Plus, Save, Send } from 'lucide-react'
+import { type BlogCategory, type BlogInput } from '@/types/api'
 import { Button } from '@/components/ui/button'
 import {
   Form,
@@ -26,6 +26,7 @@ import { Textarea } from '@/components/ui/textarea'
 import { DatePicker } from '@/components/date-picker'
 import { GalleryUpload } from '@/components/gallery-upload'
 import { SeoFields } from '@/components/seo-fields'
+import { BlogCategoryDialog } from './blog-category-dialog'
 import { BlogEditor } from './blog-editor'
 import { BlogImageUpload } from './blog-image-upload'
 import {
@@ -37,7 +38,8 @@ import {
 
 type BlogFormProps = {
   defaultValues: BlogFormValues
-  categories: Category[]
+  /** Blog-only categories. Never the product or project categories. */
+  categories: BlogCategory[]
   isSubmitting: boolean
   mode: 'create' | 'edit'
   onSubmit: (input: BlogInput) => void
@@ -72,6 +74,9 @@ export function BlogForm({
 
   const submitWith = (status: 'draft' | 'published') =>
     form.handleSubmit((values) => onSubmit(formToInput(values, status)))
+
+  // Lets an admin add a blog category without leaving the blog form.
+  const [categoryDialogOpen, setCategoryDialogOpen] = useState(false)
 
   const publishDate = form.watch('publishDate')
 
@@ -251,21 +256,43 @@ export function BlogForm({
             render={({ field }) => (
               <FormItem>
                 <FormLabel>Category</FormLabel>
-                <Select onValueChange={field.onChange} value={field.value}>
-                  <FormControl>
-                    <SelectTrigger>
-                      <SelectValue placeholder='Select a category' />
-                    </SelectTrigger>
-                  </FormControl>
-                  <SelectContent>
-                    {categories.map((c) => (
-                      <SelectItem key={c._id} value={c._id}>
-                        {c.name}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
+                <div className='flex items-center gap-2'>
+                  <Select onValueChange={field.onChange} value={field.value}>
+                    <FormControl>
+                      <SelectTrigger className='flex-1'>
+                        <SelectValue placeholder='Select a category' />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                      {categories.map((c) => (
+                        <SelectItem key={c._id} value={c._id}>
+                          {c.name}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  <Button
+                    type='button'
+                    variant='outline'
+                    size='icon'
+                    title='New blog category'
+                    onClick={() => setCategoryDialogOpen(true)}
+                  >
+                    <Plus className='size-4' />
+                  </Button>
+                </div>
+                <FormDescription>
+                  {categories.length === 0
+                    ? 'No blog categories yet. Add the first one with +.'
+                    : 'Blog categories only — separate from product categories.'}
+                </FormDescription>
                 <FormMessage />
+
+                <BlogCategoryDialog
+                  open={categoryDialogOpen}
+                  onOpenChange={setCategoryDialogOpen}
+                  onCreated={(category) => field.onChange(category._id)}
+                />
               </FormItem>
             )}
           />

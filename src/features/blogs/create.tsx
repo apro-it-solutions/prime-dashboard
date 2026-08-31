@@ -1,7 +1,7 @@
 import { useNavigate } from '@tanstack/react-router'
 import { ArrowLeft } from 'lucide-react'
 import { useCreateBlog } from '@/hooks/use-blogs'
-import { useCategories } from '@/hooks/use-categories'
+import { useBlogCategories } from '@/hooks/use-blog-categories'
 import { Button } from '@/components/ui/button'
 import { ConfigDrawer } from '@/components/config-drawer'
 import { Header } from '@/components/layout/header'
@@ -15,7 +15,7 @@ import { emptyBlogForm } from '@/components/dashboard/blogs/blog-form-schema'
 export function BlogCreate() {
   const navigate = useNavigate()
   const createMutation = useCreateBlog()
-  const { data: categoriesData } = useCategories({ limit: 100 })
+  const { data: categoriesData } = useBlogCategories({ limit: 100 })
   const categories = categoriesData?.items ?? []
 
   const goBack = () => navigate({ to: '/blogs' })

@@ -25,6 +25,7 @@ import { Route as AuthenticatedSettingsRouteRouteImport } from './routes/_authen
 import { Route as AuthenticatedAboutCmsIndexRouteImport } from './routes/_authenticated/about-cms/index'
 import { Route as AuthenticatedAppsIndexRouteImport } from './routes/_authenticated/apps/index'
 import { Route as AuthenticatedBlogsIndexRouteImport } from './routes/_authenticated/blogs/index'
+import { Route as AuthenticatedBlogsCategoriesRouteImport } from './routes/_authenticated/blogs/categories'
 import { Route as AuthenticatedBlogsCreateRouteImport } from './routes/_authenticated/blogs/create'
 import { Route as AuthenticatedCategoriesIndexRouteImport } from './routes/_authenticated/categories/index'
 import { Route as AuthenticatedChatsIndexRouteImport } from './routes/_authenticated/chats/index'
@@ -130,6 +131,12 @@ const AuthenticatedBlogsIndexRoute = AuthenticatedBlogsIndexRouteImport.update({
   path: '/blogs/',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedBlogsCategoriesRoute =
+  AuthenticatedBlogsCategoriesRouteImport.update({
+    id: '/blogs/categories',
+    path: '/blogs/categories',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedBlogsCreateRoute =
   AuthenticatedBlogsCreateRouteImport.update({
     id: '/blogs/create',
@@ -279,6 +286,7 @@ export interface FileRoutesByFullPath {
   '/404': typeof errors404Route
   '/500': typeof errors500Route
   '/503': typeof errors503Route
+  '/blogs/categories': typeof AuthenticatedBlogsCategoriesRoute
   '/blogs/create': typeof AuthenticatedBlogsCreateRoute
   '/errors/$error': typeof AuthenticatedErrorsErrorRoute
   '/projects/categories': typeof AuthenticatedProjectsCategoriesRoute
@@ -318,6 +326,7 @@ export interface FileRoutesByTo {
   '/500': typeof errors500Route
   '/503': typeof errors503Route
   '/': typeof AuthenticatedIndexRoute
+  '/blogs/categories': typeof AuthenticatedBlogsCategoriesRoute
   '/blogs/create': typeof AuthenticatedBlogsCreateRoute
   '/errors/$error': typeof AuthenticatedErrorsErrorRoute
   '/projects/categories': typeof AuthenticatedProjectsCategoriesRoute
@@ -360,6 +369,7 @@ export interface FileRoutesById {
   '/(errors)/500': typeof errors500Route
   '/(errors)/503': typeof errors503Route
   '/_authenticated/': typeof AuthenticatedIndexRoute
+  '/_authenticated/blogs/categories': typeof AuthenticatedBlogsCategoriesRoute
   '/_authenticated/blogs/create': typeof AuthenticatedBlogsCreateRoute
   '/_authenticated/errors/$error': typeof AuthenticatedErrorsErrorRoute
   '/_authenticated/projects/categories': typeof AuthenticatedProjectsCategoriesRoute
@@ -402,6 +412,7 @@ export interface FileRouteTypes {
     | '/404'
     | '/500'
     | '/503'
+    | '/blogs/categories'
     | '/blogs/create'
     | '/errors/$error'
     | '/projects/categories'
@@ -441,6 +452,7 @@ export interface FileRouteTypes {
     | '/500'
     | '/503'
     | '/'
+    | '/blogs/categories'
     | '/blogs/create'
     | '/errors/$error'
     | '/projects/categories'
@@ -482,6 +494,7 @@ export interface FileRouteTypes {
     | '/(errors)/500'
     | '/(errors)/503'
     | '/_authenticated/'
+    | '/_authenticated/blogs/categories'
     | '/_authenticated/blogs/create'
     | '/_authenticated/errors/$error'
     | '/_authenticated/projects/categories'
@@ -636,6 +649,13 @@ declare module '@tanstack/react-router' {
       path: '/blogs'
       fullPath: '/blogs/'
       preLoaderRoute: typeof AuthenticatedBlogsIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/blogs/categories': {
+      id: '/_authenticated/blogs/categories'
+      path: '/blogs/categories'
+      fullPath: '/blogs/categories'
+      preLoaderRoute: typeof AuthenticatedBlogsCategoriesRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/blogs/create': {
@@ -828,6 +848,7 @@ const AuthenticatedSettingsRouteRouteWithChildren =
 interface AuthenticatedRouteRouteChildren {
   AuthenticatedSettingsRouteRoute: typeof AuthenticatedSettingsRouteRouteWithChildren
   AuthenticatedIndexRoute: typeof AuthenticatedIndexRoute
+  AuthenticatedBlogsCategoriesRoute: typeof AuthenticatedBlogsCategoriesRoute
   AuthenticatedBlogsCreateRoute: typeof AuthenticatedBlogsCreateRoute
   AuthenticatedErrorsErrorRoute: typeof AuthenticatedErrorsErrorRoute
   AuthenticatedProjectsCategoriesRoute: typeof AuthenticatedProjectsCategoriesRoute
@@ -854,6 +875,7 @@ interface AuthenticatedRouteRouteChildren {
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedSettingsRouteRoute: AuthenticatedSettingsRouteRouteWithChildren,
   AuthenticatedIndexRoute: AuthenticatedIndexRoute,
+  AuthenticatedBlogsCategoriesRoute: AuthenticatedBlogsCategoriesRoute,
   AuthenticatedBlogsCreateRoute: AuthenticatedBlogsCreateRoute,
   AuthenticatedErrorsErrorRoute: AuthenticatedErrorsErrorRoute,
   AuthenticatedProjectsCategoriesRoute: AuthenticatedProjectsCategoriesRoute,

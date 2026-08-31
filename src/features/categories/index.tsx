@@ -139,9 +139,12 @@ export function Categories() {
       <Main>
         <div className='mb-4 flex items-center justify-between'>
           <div>
-            <h1 className='text-2xl font-bold tracking-tight'>Categories</h1>
+            <h1 className='text-2xl font-bold tracking-tight'>
+              Product Categories
+            </h1>
             <p className='text-muted-foreground'>
-              Manage product and blog categories.
+              Used by products only — blog and project categories are managed
+              inside their own sections.
             </p>
           </div>
           <Button onClick={openCreate}>
@@ -150,7 +153,7 @@ export function Categories() {
         </div>
 
         <div className='mb-4'>
-          <SearchInput onChange={onSearch} placeholder='Search categories…' />
+          <SearchInput onChange={onSearch} placeholder='Search product categories…' />
         </div>
 
         <div className='rounded-md border'>
@@ -161,17 +164,16 @@ export function Categories() {
                 <TableHead>Slug</TableHead>
                 <TableHead>Status</TableHead>
                 <TableHead className='text-center'>Products</TableHead>
-                <TableHead className='text-center'>Blogs</TableHead>
                 <TableHead className='w-24 text-end'>Actions</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {isLoading ? (
-                <DataLoading colSpan={6} />
+                <DataLoading colSpan={5} />
               ) : isError ? (
-                <DataError colSpan={6} onRetry={() => refetch()} />
+                <DataError colSpan={5} onRetry={() => refetch()} />
               ) : categories.length === 0 ? (
-                <EmptyRow colSpan={6} label='No categories found.' />
+                <EmptyRow colSpan={5} label='No product categories found.' />
               ) : (
                 categories.map((category) => (
                   <TableRow key={category._id}>
@@ -190,9 +192,6 @@ export function Categories() {
                     </TableCell>
                     <TableCell className='text-center'>
                       <Badge variant='outline'>{category.productCount ?? 0}</Badge>
-                    </TableCell>
-                    <TableCell className='text-center'>
-                      <Badge variant='outline'>{category.blogCount ?? 0}</Badge>
                     </TableCell>
                     <TableCell className='text-end'>
                       <div className='flex justify-end gap-1'>
@@ -226,11 +225,13 @@ export function Categories() {
       <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>{editing ? 'Edit' : 'Add'} Category</DialogTitle>
+            <DialogTitle>
+              {editing ? 'Edit' : 'Add'} Product Category
+            </DialogTitle>
             <DialogDescription>
               {editing
-                ? 'Update the category details.'
-                : 'Create a new category.'}
+                ? 'Update the product category details.'
+                : 'Create a new product category.'}
             </DialogDescription>
           </DialogHeader>
           <Form {...form}>

@@ -108,8 +108,6 @@ export interface Category {
   status: CategoryStatus
   /** Number of products referencing this category (attached by the list endpoint). */
   productCount?: number
-  /** Number of blogs referencing this category (attached by the list endpoint). */
-  blogCount?: number
   createdAt: string
   updatedAt: string
 }
@@ -121,7 +119,7 @@ export interface CategoryInput {
   status?: CategoryStatus
 }
 
-/** Category as populated inside product/blog list responses. */
+/** Category as populated inside product/project/blog list responses. */
 export interface CategoryRef {
   _id: string
   name: string
@@ -131,8 +129,9 @@ export interface CategoryRef {
 // ----- Project category -----
 //
 // Projects have their own category collection, completely separate from the
-// Category type above (which serves products and blogs). A category created for
-// a blog never appears in the project dropdown, and vice versa.
+// Category type above (which serves products) and from BlogCategory below. A
+// category created for a blog never appears in the project dropdown, and vice
+// versa.
 
 export interface ProjectCategory {
   _id: string
@@ -147,6 +146,30 @@ export interface ProjectCategory {
 }
 
 export interface ProjectCategoryInput {
+  name: string
+  slug?: string
+  description?: string
+  status?: CategoryStatus
+}
+
+// ----- Blog category -----
+//
+// Blogs likewise own their categories. Managed under Blogs > Blog Categories and
+// never mixed with product or project categories.
+
+export interface BlogCategory {
+  _id: string
+  name: string
+  slug: string
+  description?: string
+  status: CategoryStatus
+  /** Number of blogs referencing this category (attached by the list endpoint). */
+  blogCount?: number
+  createdAt: string
+  updatedAt: string
+}
+
+export interface BlogCategoryInput {
   name: string
   slug?: string
   description?: string

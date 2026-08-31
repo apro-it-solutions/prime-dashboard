@@ -1,7 +1,7 @@
 import { useNavigate } from '@tanstack/react-router'
 import { ArrowLeft } from 'lucide-react'
 import { useBlog, useUpdateBlog } from '@/hooks/use-blogs'
-import { useCategories } from '@/hooks/use-categories'
+import { useBlogCategories } from '@/hooks/use-blog-categories'
 import { Button } from '@/components/ui/button'
 import { Skeleton } from '@/components/ui/skeleton'
 import { ConfigDrawer } from '@/components/config-drawer'
@@ -19,7 +19,7 @@ export function BlogEdit({ id }: BlogEditProps) {
   const navigate = useNavigate()
   const { data: blog, isLoading, isError, refetch } = useBlog(id)
   const updateMutation = useUpdateBlog()
-  const { data: categoriesData } = useCategories({ limit: 100 })
+  const { data: categoriesData } = useBlogCategories({ limit: 100 })
   const categories = categoriesData?.items ?? []
 
   const goBack = () => navigate({ to: '/blogs' })

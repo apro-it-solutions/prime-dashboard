@@ -1,10 +1,10 @@
 import { useState } from 'react'
 import { Link, useNavigate } from '@tanstack/react-router'
 import { format } from 'date-fns'
-import { Plus } from 'lucide-react'
+import { FolderTree, Plus } from 'lucide-react'
 import { type Blog, type ListQuery } from '@/types/api'
 import { useBlogs, useDeleteBlog } from '@/hooks/use-blogs'
-import { useCategories } from '@/hooks/use-categories'
+import { useBlogCategories } from '@/hooks/use-blog-categories'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import {
@@ -57,7 +57,7 @@ export function Blogs() {
   }
 
   const { data, isLoading, isError, refetch } = useBlogs(params)
-  const { data: categoriesData } = useCategories({ limit: 100 })
+  const { data: categoriesData } = useBlogCategories({ limit: 100 })
   const deleteMutation = useDeleteBlog()
 
   const [viewing, setViewing] = useState<Blog | null>(null)
@@ -85,11 +85,18 @@ export function Blogs() {
             <h1 className='text-2xl font-bold tracking-tight'>Blogs</h1>
             <p className='text-muted-foreground'>Manage your blog posts.</p>
           </div>
-          <Button asChild>
-            <Link to='/blogs/create'>
-              <Plus /> Add Blog
-            </Link>
-          </Button>
+          <div className='flex items-center gap-2'>
+            <Button variant='outline' asChild>
+              <Link to='/blogs/categories'>
+                <FolderTree /> Categories
+              </Link>
+            </Button>
+            <Button asChild>
+              <Link to='/blogs/create'>
+                <Plus /> Add Blog
+              </Link>
+            </Button>
+          </div>
         </div>
 
         <div className='mb-4 flex flex-col gap-2 lg:flex-row lg:items-center lg:justify-between'>

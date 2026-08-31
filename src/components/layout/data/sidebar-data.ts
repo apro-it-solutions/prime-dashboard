@@ -44,7 +44,7 @@ export const sidebarData: SidebarData = {
         },
         {
           // Collapsible: project categories are managed inside the Projects
-          // section, separately from the shared product/blog categories below.
+          // section, separately from the product categories below.
           title: 'Projects',
           icon: FolderKanban,
           items: [
@@ -53,14 +53,21 @@ export const sidebarData: SidebarData = {
           ],
         },
         {
-          title: 'Categories',
+          // Products-only categories. Projects and blogs each manage their own
+          // categories from inside their own section.
+          title: 'Product Categories',
           url: '/categories',
           icon: FolderTree,
         },
         {
+          // Collapsible: blog categories are managed inside the Blogs section,
+          // separately from the product categories above.
           title: 'Blogs',
-          url: '/blogs',
           icon: Newspaper,
+          items: [
+            { title: 'All Blogs', url: '/blogs' },
+            { title: 'Blog Categories', url: '/blogs/categories' },
+          ],
         },
         {
           title: 'Testimonials',
