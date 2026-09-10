@@ -116,8 +116,8 @@ export function BlogCategoryDialog({
         <DialogHeader>
           <DialogTitle>{editing ? 'Edit' : 'Add'} Blog Category</DialogTitle>
           <DialogDescription>
-            Blog categories are separate from the product categories managed
-            under Categories and from project categories.
+            Blog categories live in their own collection, separate from
+            project categories.
           </DialogDescription>
         </DialogHeader>
         <Form {...form}>

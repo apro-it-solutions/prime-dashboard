@@ -47,7 +47,7 @@ function RequiredMark() {
 
 type ProjectFormProps = {
   defaultValues: ProjectFormValues
-  /** Project-only categories. Never the shared product/blog categories. */
+  /** Project-only categories. Never the blog categories. */
   categories: ProjectCategory[]
   isSubmitting: boolean
   mode: 'create' | 'edit'

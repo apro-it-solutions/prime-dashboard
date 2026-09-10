@@ -12,10 +12,11 @@ import {
   TableRow,
 } from '@/components/ui/table'
 import { DataError, DataLoading, EmptyRow } from '@/features/shared/data-states'
+import { resolveImageUrl } from '@/lib/image-url'
 import { TestimonialRating } from './testimonial-rating'
 import { TestimonialStatusBadge } from './testimonial-status-badge'
 
-const COL_SPAN = 8
+const COL_SPAN = 7
 
 const fmtDate = (value?: string): string =>
   value ? format(new Date(value), 'PP') : '—'
@@ -64,7 +65,6 @@ export function TestimonialTable({
             <TableHead className='w-16'>Avatar</TableHead>
             <TableHead className='min-w-40'>Name</TableHead>
             <TableHead>Designation</TableHead>
-            <TableHead>Company</TableHead>
             <TableHead>Rating</TableHead>
             <TableHead>Status</TableHead>
             <TableHead>Created</TableHead>
@@ -84,7 +84,7 @@ export function TestimonialTable({
                 <TableCell>
                   <Avatar className='size-10'>
                     <AvatarImage
-                      src={testimonial.avatar}
+                      src={resolveImageUrl(testimonial.avatar)}
                       alt={testimonial.name}
                       className='object-cover'
                     />
@@ -98,9 +98,6 @@ export function TestimonialTable({
                 </TableCell>
                 <TableCell className='text-muted-foreground'>
                   <span className='line-clamp-1'>{testimonial.designation}</span>
-                </TableCell>
-                <TableCell className='text-muted-foreground'>
-                  {testimonial.company || '—'}
                 </TableCell>
                 <TableCell>
                   <TestimonialRating value={testimonial.rating} />

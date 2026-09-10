@@ -47,6 +47,51 @@ import { DataError, DataLoading, EmptyRow } from '@/features/shared/data-states'
 const PAGE_SIZE = 10
 const READ_ALL = 'all'
 
+/** Column count, kept in step with the header row below. */
+const COL_SPAN = 9
+
+const EMPTY = '—'
+
+/**
+ * What the enquiry is about.
+ *
+ * `projectType` is the field the form actually collects. Submissions taken
+ * before it had a column of its own only carry `subject` ("Warehouse — Acme
+ * Corp"), so that is the fallback rather than showing those rows as blank.
+ */
+const summaryOf = (msg: ContactMessage): string =>
+  msg.projectType?.trim() || msg.subject?.trim() || '(no subject)'
+
+/** One labelled line in the detail view. */
+function DetailRow({
+  label,
+  value,
+  href,
+}: {
+  label: string
+  value?: string
+  href?: string
+}) {
+  return (
+    <div className='grid grid-cols-3 gap-3 sm:grid-cols-4'>
+      <dt className='text-xs text-muted-foreground'>{label}</dt>
+      <dd className='col-span-2 text-sm break-words sm:col-span-3'>
+        {value ? (
+          href ? (
+            <a className='underline underline-offset-2' href={href}>
+              {value}
+            </a>
+          ) : (
+            value
+          )
+        ) : (
+          <span className='text-muted-foreground'>{EMPTY}</span>
+        )}
+      </dd>
+    </div>
+  )
+}
+
 export function Contact() {
   const [page, setPage] = useState(1)
   const [search, setSearch] = useState('')
@@ -125,24 +170,32 @@ export function Contact() {
           </Select>
         </div>
 
-        <div className='rounded-md border'>
+        <div className='overflow-x-auto rounded-md border'>
           <Table>
             <TableHeader>
               <TableRow>
                 <TableHead className='w-10'></TableHead>
-                <TableHead>From</TableHead>
-                <TableHead>Subject</TableHead>
-                <TableHead>Received</TableHead>
+                <TableHead className='min-w-32'>From</TableHead>
+                <TableHead className='min-w-36'>Subject / Project Type</TableHead>
+                <TableHead className='min-w-48'>Message</TableHead>
+                <TableHead className='min-w-44'>Email</TableHead>
+                <TableHead className='hidden min-w-32 lg:table-cell'>
+                  Phone
+                </TableHead>
+                <TableHead className='hidden min-w-32 lg:table-cell'>
+                  Company
+                </TableHead>
+                <TableHead className='min-w-36'>Received</TableHead>
                 <TableHead className='w-32 text-end'>Actions</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {isLoading ? (
-                <DataLoading colSpan={5} />
+                <DataLoading colSpan={COL_SPAN} />
               ) : isError ? (
-                <DataError colSpan={5} onRetry={() => refetch()} />
+                <DataError colSpan={COL_SPAN} onRetry={() => refetch()} />
               ) : messages.length === 0 ? (
-                <EmptyRow colSpan={5} label='Your inbox is empty.' />
+                <EmptyRow colSpan={COL_SPAN} label='Your inbox is empty.' />
               ) : (
                 messages.map((msg) => (
                   <TableRow
@@ -156,18 +209,26 @@ export function Contact() {
                         <Mail className='size-4 text-primary' />
                       )}
                     </TableCell>
-                    <TableCell>
-                      <div className='flex flex-col'>
-                        <span>{msg.name}</span>
-                        <span className='text-xs font-normal text-muted-foreground'>
-                          {msg.email}
-                        </span>
-                      </div>
+                    <TableCell>{msg.name}</TableCell>
+                    <TableCell className='max-w-52 truncate'>
+                      {summaryOf(msg)}
                     </TableCell>
-                    <TableCell className='max-w-xs truncate'>
-                      {msg.subject || '(no subject)'}
+                    <TableCell
+                      className='max-w-xs truncate font-normal text-muted-foreground'
+                      title={msg.message}
+                    >
+                      {msg.message}
                     </TableCell>
-                    <TableCell className='text-muted-foreground'>
+                    <TableCell className='max-w-56 truncate text-muted-foreground'>
+                      {msg.email}
+                    </TableCell>
+                    <TableCell className='hidden text-muted-foreground lg:table-cell'>
+                      {msg.phone || EMPTY}
+                    </TableCell>
+                    <TableCell className='hidden max-w-40 truncate text-muted-foreground lg:table-cell'>
+                      {msg.company || EMPTY}
+                    </TableCell>
+                    <TableCell className='whitespace-nowrap text-muted-foreground'>
                       {format(new Date(msg.createdAt), 'PPp')}
                     </TableCell>
                     <TableCell className='text-end'>
@@ -219,19 +280,18 @@ export function Contact() {
         open={Boolean(viewingId)}
         onOpenChange={(open) => !open && setViewingId(null)}
       >
-        <DialogContent className='sm:max-w-lg'>
+        <DialogContent className='max-h-[90vh] overflow-y-auto sm:max-w-lg'>
           <DialogHeader>
-            <DialogTitle>{viewing?.subject || 'Message'}</DialogTitle>
+            <DialogTitle>
+              {viewing ? summaryOf(viewing) : 'Message'}
+            </DialogTitle>
             <DialogDescription>
-              {viewing ? (
-                <>
-                  From <span className='font-medium'>{viewing.name}</span> ·{' '}
-                  {viewing.email}
-                  {viewing.phone ? ` · ${viewing.phone}` : ''}
-                </>
-              ) : (
-                'Loading message…'
-              )}
+              {viewing
+                ? `Submitted through the website contact form on ${format(
+                    new Date(viewing.createdAt),
+                    'PPPp'
+                  )}.`
+                : 'Loading message…'}
             </DialogDescription>
           </DialogHeader>
           {isViewLoading ? (
@@ -239,11 +299,49 @@ export function Contact() {
               <Loader2 className='size-5 animate-spin text-muted-foreground' />
             </div>
           ) : viewing ? (
-            <div className='space-y-3'>
-              <p className='text-xs text-muted-foreground'>
-                {format(new Date(viewing.createdAt), 'PPPp')}
-              </p>
-              <p className='whitespace-pre-wrap text-sm'>{viewing.message}</p>
+            /* Every field the form collects, in the order it is filled in.
+               Long messages live here rather than in the table, so a wall of
+               text never stretches the inbox. */
+            <div className='space-y-4'>
+              <dl className='space-y-2.5'>
+                <DetailRow label='Full name' value={viewing.name} />
+                <DetailRow label='Company' value={viewing.company} />
+                <DetailRow
+                  label='Email'
+                  value={viewing.email}
+                  href={`mailto:${viewing.email}`}
+                />
+                <DetailRow
+                  label='Phone'
+                  value={viewing.phone}
+                  href={viewing.phone ? `tel:${viewing.phone}` : undefined}
+                />
+                <DetailRow label='Project type' value={viewing.projectType} />
+                {/* Only worth its own line when it is not the project type and
+                    company repeated back — which is all it holds on submissions
+                    taken before those had columns of their own. */}
+                {viewing.subject &&
+                  viewing.subject !==
+                    [viewing.projectType, viewing.company]
+                      .filter(Boolean)
+                      .join(' — ') && (
+                    <DetailRow label='Subject' value={viewing.subject} />
+                  )}
+                <DetailRow
+                  label='Received'
+                  value={format(new Date(viewing.createdAt), 'PPPp')}
+                />
+              </dl>
+
+              <div className='space-y-1.5'>
+                <p className='text-xs text-muted-foreground'>
+                  Message / requirements
+                </p>
+                <p className='whitespace-pre-wrap rounded-md border bg-muted/40 p-3 text-sm'>
+                  {viewing.message}
+                </p>
+              </div>
+
               <div>
                 <Badge variant={viewing.isRead ? 'secondary' : 'default'}>
                   {viewing.isRead ? 'Read' : 'Unread'}

@@ -2,9 +2,8 @@ import { useEffect } from 'react'
 import { z } from 'zod'
 import { useForm, useFieldArray } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { Check, ChevronsUpDown, Loader2, Plus, Trash2, X } from 'lucide-react'
+import { Loader2, Plus, Trash2 } from 'lucide-react'
 import { useHome, useUpdateHome } from '@/hooks/use-home'
-import { useProducts } from '@/hooks/use-products'
 import { type HomePageInput } from '@/types/api'
 import {
   emptySeoForm,
@@ -12,8 +11,6 @@ import {
   seoFormSchema,
   toSeoForm,
 } from '@/lib/seo'
-import { cn } from '@/lib/utils'
-import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import {
   Card,
@@ -23,14 +20,6 @@ import {
   CardTitle,
 } from '@/components/ui/card'
 import {
-  Command,
-  CommandEmpty,
-  CommandGroup,
-  CommandInput,
-  CommandItem,
-  CommandList,
-} from '@/components/ui/command'
-import {
   Form,
   FormControl,
   FormField,
@@ -39,11 +28,6 @@ import {
   FormMessage,
 } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from '@/components/ui/popover'
 import { Separator } from '@/components/ui/separator'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Textarea } from '@/components/ui/textarea'
@@ -77,16 +61,12 @@ const homeSchema = z.object({
     description: z.string().optional(),
     image: z.string().optional(),
   }),
-  featuredProducts: z.array(z.string()),
   whyChooseUs: z.array(whyChooseUsSchema),
   gallery: z.array(z.string()),
   seo: seoFormSchema,
 })
 
 type HomeFormValues = z.infer<typeof homeSchema>
-
-/** featuredProducts may come back populated as objects from the GET endpoint. */
-type FeaturedRef = string | { _id: string }
 
 const emptyForm: HomeFormValues = {
   hero: {
@@ -98,7 +78,6 @@ const emptyForm: HomeFormValues = {
     ctaLink: '',
   },
   about: { title: '', description: '', image: '' },
-  featuredProducts: [],
   whyChooseUs: [],
   gallery: [],
   seo: emptySeoForm,
@@ -106,10 +85,7 @@ const emptyForm: HomeFormValues = {
 
 export function HomeCms() {
   const { data, isLoading, isError, refetch } = useHome()
-  const { data: productsData } = useProducts({ limit: 100 })
   const updateMutation = useUpdateHome()
-
-  const products = productsData?.items ?? []
 
   const form = useForm<HomeFormValues>({
     resolver: zodResolver(homeSchema),
@@ -123,9 +99,6 @@ export function HomeCms() {
 
   useEffect(() => {
     if (!data) return
-    const featuredIds = (
-      (data.featuredProducts ?? []) as unknown as FeaturedRef[]
-    ).map((p) => (typeof p === 'string' ? p : p._id))
 
     form.reset({
       hero: {
@@ -141,7 +114,6 @@ export function HomeCms() {
         description: data.about?.description ?? '',
         image: data.about?.image ?? '',
       },
-      featuredProducts: featuredIds,
       whyChooseUs: data.whyChooseUs ?? [],
       gallery: data.gallery ?? [],
       seo: toSeoForm(data.seo),
@@ -152,7 +124,6 @@ export function HomeCms() {
     const input: HomePageInput = {
       hero: values.hero,
       about: values.about,
-      featuredProducts: values.featuredProducts,
       whyChooseUs: values.whyChooseUs,
       gallery: values.gallery,
       seo: fromSeoForm(values.seo),
@@ -212,7 +183,6 @@ export function HomeCms() {
                 <TabsList className='flex flex-wrap'>
                   <TabsTrigger value='hero'>Hero</TabsTrigger>
                   <TabsTrigger value='about'>About</TabsTrigger>
-                  <TabsTrigger value='featured'>Featured</TabsTrigger>
                   <TabsTrigger value='why'>Why Choose Us</TabsTrigger>
                   <TabsTrigger value='gallery'>Gallery</TabsTrigger>
                   <TabsTrigger value='seo'>SEO</TabsTrigger>
@@ -396,118 +366,6 @@ export function HomeCms() {
                             <FormMessage />
                           </FormItem>
                         )}
-                      />
-                    </CardContent>
-                  </Card>
-                </TabsContent>
-
-                {/* Featured Products */}
-                <TabsContent value='featured'>
-                  <Card>
-                    <CardHeader>
-                      <CardTitle>Featured Products</CardTitle>
-                      <CardDescription>
-                        Choose which products are highlighted on the home page.
-                      </CardDescription>
-                    </CardHeader>
-                    <CardContent>
-                      <FormField
-                        control={form.control}
-                        name='featuredProducts'
-                        render={({ field }) => {
-                          const selected = field.value ?? []
-                          const toggle = (id: string) =>
-                            field.onChange(
-                              selected.includes(id)
-                                ? selected.filter((v) => v !== id)
-                                : [...selected, id]
-                            )
-                          const titleOf = (id: string) =>
-                            products.find((p) => p._id === id)?.title ?? id
-
-                          return (
-                            <FormItem className='space-y-3'>
-                              <FormLabel>Products</FormLabel>
-                              <Popover>
-                                <PopoverTrigger asChild>
-                                  <FormControl>
-                                    <Button
-                                      type='button'
-                                      variant='outline'
-                                      className='w-full justify-between font-normal'
-                                    >
-                                      {selected.length > 0
-                                        ? `${selected.length} product${selected.length > 1 ? 's' : ''} selected`
-                                        : 'Select products'}
-                                      <ChevronsUpDown className='size-4 opacity-50' />
-                                    </Button>
-                                  </FormControl>
-                                </PopoverTrigger>
-                                <PopoverContent
-                                  className='w-[--radix-popover-trigger-width] p-0'
-                                  align='start'
-                                >
-                                  <Command>
-                                    <CommandInput placeholder='Search products…' />
-                                    <CommandList>
-                                      <CommandEmpty>
-                                        No products found.
-                                      </CommandEmpty>
-                                      <CommandGroup>
-                                        {products.map((product) => {
-                                          const isChecked = selected.includes(
-                                            product._id
-                                          )
-                                          return (
-                                            <CommandItem
-                                              key={product._id}
-                                              value={product.title}
-                                              onSelect={() =>
-                                                toggle(product._id)
-                                              }
-                                            >
-                                              <Check
-                                                className={cn(
-                                                  'size-4',
-                                                  isChecked
-                                                    ? 'opacity-100'
-                                                    : 'opacity-0'
-                                                )}
-                                              />
-                                              {product.title}
-                                            </CommandItem>
-                                          )
-                                        })}
-                                      </CommandGroup>
-                                    </CommandList>
-                                  </Command>
-                                </PopoverContent>
-                              </Popover>
-
-                              {selected.length > 0 && (
-                                <div className='flex flex-wrap gap-2'>
-                                  {selected.map((id) => (
-                                    <Badge
-                                      key={id}
-                                      variant='secondary'
-                                      className='gap-1'
-                                    >
-                                      {titleOf(id)}
-                                      <button
-                                        type='button'
-                                        onClick={() => toggle(id)}
-                                        className='ms-1 rounded-full outline-none hover:text-destructive'
-                                      >
-                                        <X className='size-3' />
-                                      </button>
-                                    </Badge>
-                                  ))}
-                                </div>
-                              )}
-                              <FormMessage />
-                            </FormItem>
-                          )
-                        }}
                       />
                     </CardContent>
                   </Card>

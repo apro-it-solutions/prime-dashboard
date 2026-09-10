@@ -24,25 +24,29 @@ import { Route as AuthenticatedIndexRouteImport } from './routes/_authenticated/
 import { Route as AuthenticatedSettingsRouteRouteImport } from './routes/_authenticated/settings/route'
 import { Route as AuthenticatedAboutCmsIndexRouteImport } from './routes/_authenticated/about-cms/index'
 import { Route as AuthenticatedAppsIndexRouteImport } from './routes/_authenticated/apps/index'
+import { Route as AuthenticatedBlogsCmsIndexRouteImport } from './routes/_authenticated/blogs-cms/index'
 import { Route as AuthenticatedBlogsIndexRouteImport } from './routes/_authenticated/blogs/index'
 import { Route as AuthenticatedBlogsCategoriesRouteImport } from './routes/_authenticated/blogs/categories'
 import { Route as AuthenticatedBlogsCreateRouteImport } from './routes/_authenticated/blogs/create'
-import { Route as AuthenticatedCategoriesIndexRouteImport } from './routes/_authenticated/categories/index'
 import { Route as AuthenticatedChatsIndexRouteImport } from './routes/_authenticated/chats/index'
+import { Route as AuthenticatedContactCmsIndexRouteImport } from './routes/_authenticated/contact-cms/index'
 import { Route as AuthenticatedContactIndexRouteImport } from './routes/_authenticated/contact/index'
 import { Route as AuthenticatedErrorsErrorRouteImport } from './routes/_authenticated/errors/$error'
 import { Route as AuthenticatedHelpCenterIndexRouteImport } from './routes/_authenticated/help-center/index'
 import { Route as AuthenticatedHomeCmsIndexRouteImport } from './routes/_authenticated/home-cms/index'
-import { Route as AuthenticatedProductsIndexRouteImport } from './routes/_authenticated/products/index'
+import { Route as AuthenticatedProjectsCmsIndexRouteImport } from './routes/_authenticated/projects-cms/index'
 import { Route as AuthenticatedProjectsIndexRouteImport } from './routes/_authenticated/projects/index'
 import { Route as AuthenticatedProjectsCategoriesRouteImport } from './routes/_authenticated/projects/categories'
 import { Route as AuthenticatedProjectsCreateRouteImport } from './routes/_authenticated/projects/create'
+import { Route as AuthenticatedServicesCmsIndexRouteImport } from './routes/_authenticated/services-cms/index'
 import { Route as AuthenticatedSettingsIndexRouteImport } from './routes/_authenticated/settings/index'
 import { Route as AuthenticatedSettingsAccountRouteImport } from './routes/_authenticated/settings/account'
 import { Route as AuthenticatedSettingsAppearanceRouteImport } from './routes/_authenticated/settings/appearance'
 import { Route as AuthenticatedSettingsDisplayRouteImport } from './routes/_authenticated/settings/display'
 import { Route as AuthenticatedSettingsNotificationsRouteImport } from './routes/_authenticated/settings/notifications'
+import { Route as AuthenticatedSubscribersIndexRouteImport } from './routes/_authenticated/subscribers/index'
 import { Route as AuthenticatedTasksIndexRouteImport } from './routes/_authenticated/tasks/index'
+import { Route as AuthenticatedTestimonialsCmsIndexRouteImport } from './routes/_authenticated/testimonials-cms/index'
 import { Route as AuthenticatedTestimonialsIndexRouteImport } from './routes/_authenticated/testimonials/index'
 import { Route as AuthenticatedTestimonialsCreateRouteImport } from './routes/_authenticated/testimonials/create'
 import { Route as AuthenticatedUsersIndexRouteImport } from './routes/_authenticated/users/index'
@@ -126,6 +130,12 @@ const AuthenticatedAppsIndexRoute = AuthenticatedAppsIndexRouteImport.update({
   path: '/apps/',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedBlogsCmsIndexRoute =
+  AuthenticatedBlogsCmsIndexRouteImport.update({
+    id: '/blogs-cms/',
+    path: '/blogs-cms/',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedBlogsIndexRoute = AuthenticatedBlogsIndexRouteImport.update({
   id: '/blogs/',
   path: '/blogs/',
@@ -143,17 +153,17 @@ const AuthenticatedBlogsCreateRoute =
     path: '/blogs/create',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
-const AuthenticatedCategoriesIndexRoute =
-  AuthenticatedCategoriesIndexRouteImport.update({
-    id: '/categories/',
-    path: '/categories/',
-    getParentRoute: () => AuthenticatedRouteRoute,
-  } as any)
 const AuthenticatedChatsIndexRoute = AuthenticatedChatsIndexRouteImport.update({
   id: '/chats/',
   path: '/chats/',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedContactCmsIndexRoute =
+  AuthenticatedContactCmsIndexRouteImport.update({
+    id: '/contact-cms/',
+    path: '/contact-cms/',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedContactIndexRoute =
   AuthenticatedContactIndexRouteImport.update({
     id: '/contact/',
@@ -178,10 +188,10 @@ const AuthenticatedHomeCmsIndexRoute =
     path: '/home-cms/',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
-const AuthenticatedProductsIndexRoute =
-  AuthenticatedProductsIndexRouteImport.update({
-    id: '/products/',
-    path: '/products/',
+const AuthenticatedProjectsCmsIndexRoute =
+  AuthenticatedProjectsCmsIndexRouteImport.update({
+    id: '/projects-cms/',
+    path: '/projects-cms/',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
 const AuthenticatedProjectsIndexRoute =
@@ -200,6 +210,12 @@ const AuthenticatedProjectsCreateRoute =
   AuthenticatedProjectsCreateRouteImport.update({
     id: '/projects/create',
     path: '/projects/create',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedServicesCmsIndexRoute =
+  AuthenticatedServicesCmsIndexRouteImport.update({
+    id: '/services-cms/',
+    path: '/services-cms/',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
 const AuthenticatedSettingsIndexRoute =
@@ -232,11 +248,23 @@ const AuthenticatedSettingsNotificationsRoute =
     path: '/notifications',
     getParentRoute: () => AuthenticatedSettingsRouteRoute,
   } as any)
+const AuthenticatedSubscribersIndexRoute =
+  AuthenticatedSubscribersIndexRouteImport.update({
+    id: '/subscribers/',
+    path: '/subscribers/',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedTasksIndexRoute = AuthenticatedTasksIndexRouteImport.update({
   id: '/tasks/',
   path: '/tasks/',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedTestimonialsCmsIndexRoute =
+  AuthenticatedTestimonialsCmsIndexRouteImport.update({
+    id: '/testimonials-cms/',
+    path: '/testimonials-cms/',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedTestimonialsIndexRoute =
   AuthenticatedTestimonialsIndexRouteImport.update({
     id: '/testimonials/',
@@ -298,16 +326,20 @@ export interface FileRoutesByFullPath {
   '/testimonials/create': typeof AuthenticatedTestimonialsCreateRoute
   '/about-cms/': typeof AuthenticatedAboutCmsIndexRoute
   '/apps/': typeof AuthenticatedAppsIndexRoute
+  '/blogs-cms/': typeof AuthenticatedBlogsCmsIndexRoute
   '/blogs/': typeof AuthenticatedBlogsIndexRoute
-  '/categories/': typeof AuthenticatedCategoriesIndexRoute
   '/chats/': typeof AuthenticatedChatsIndexRoute
+  '/contact-cms/': typeof AuthenticatedContactCmsIndexRoute
   '/contact/': typeof AuthenticatedContactIndexRoute
   '/help-center/': typeof AuthenticatedHelpCenterIndexRoute
   '/home-cms/': typeof AuthenticatedHomeCmsIndexRoute
-  '/products/': typeof AuthenticatedProductsIndexRoute
+  '/projects-cms/': typeof AuthenticatedProjectsCmsIndexRoute
   '/projects/': typeof AuthenticatedProjectsIndexRoute
+  '/services-cms/': typeof AuthenticatedServicesCmsIndexRoute
   '/settings/': typeof AuthenticatedSettingsIndexRoute
+  '/subscribers/': typeof AuthenticatedSubscribersIndexRoute
   '/tasks/': typeof AuthenticatedTasksIndexRoute
+  '/testimonials-cms/': typeof AuthenticatedTestimonialsCmsIndexRoute
   '/testimonials/': typeof AuthenticatedTestimonialsIndexRoute
   '/users/': typeof AuthenticatedUsersIndexRoute
   '/blogs/$id/edit': typeof AuthenticatedBlogsIdEditRoute
@@ -338,16 +370,20 @@ export interface FileRoutesByTo {
   '/testimonials/create': typeof AuthenticatedTestimonialsCreateRoute
   '/about-cms': typeof AuthenticatedAboutCmsIndexRoute
   '/apps': typeof AuthenticatedAppsIndexRoute
+  '/blogs-cms': typeof AuthenticatedBlogsCmsIndexRoute
   '/blogs': typeof AuthenticatedBlogsIndexRoute
-  '/categories': typeof AuthenticatedCategoriesIndexRoute
   '/chats': typeof AuthenticatedChatsIndexRoute
+  '/contact-cms': typeof AuthenticatedContactCmsIndexRoute
   '/contact': typeof AuthenticatedContactIndexRoute
   '/help-center': typeof AuthenticatedHelpCenterIndexRoute
   '/home-cms': typeof AuthenticatedHomeCmsIndexRoute
-  '/products': typeof AuthenticatedProductsIndexRoute
+  '/projects-cms': typeof AuthenticatedProjectsCmsIndexRoute
   '/projects': typeof AuthenticatedProjectsIndexRoute
+  '/services-cms': typeof AuthenticatedServicesCmsIndexRoute
   '/settings': typeof AuthenticatedSettingsIndexRoute
+  '/subscribers': typeof AuthenticatedSubscribersIndexRoute
   '/tasks': typeof AuthenticatedTasksIndexRoute
+  '/testimonials-cms': typeof AuthenticatedTestimonialsCmsIndexRoute
   '/testimonials': typeof AuthenticatedTestimonialsIndexRoute
   '/users': typeof AuthenticatedUsersIndexRoute
   '/blogs/$id/edit': typeof AuthenticatedBlogsIdEditRoute
@@ -381,16 +417,20 @@ export interface FileRoutesById {
   '/_authenticated/testimonials/create': typeof AuthenticatedTestimonialsCreateRoute
   '/_authenticated/about-cms/': typeof AuthenticatedAboutCmsIndexRoute
   '/_authenticated/apps/': typeof AuthenticatedAppsIndexRoute
+  '/_authenticated/blogs-cms/': typeof AuthenticatedBlogsCmsIndexRoute
   '/_authenticated/blogs/': typeof AuthenticatedBlogsIndexRoute
-  '/_authenticated/categories/': typeof AuthenticatedCategoriesIndexRoute
   '/_authenticated/chats/': typeof AuthenticatedChatsIndexRoute
+  '/_authenticated/contact-cms/': typeof AuthenticatedContactCmsIndexRoute
   '/_authenticated/contact/': typeof AuthenticatedContactIndexRoute
   '/_authenticated/help-center/': typeof AuthenticatedHelpCenterIndexRoute
   '/_authenticated/home-cms/': typeof AuthenticatedHomeCmsIndexRoute
-  '/_authenticated/products/': typeof AuthenticatedProductsIndexRoute
+  '/_authenticated/projects-cms/': typeof AuthenticatedProjectsCmsIndexRoute
   '/_authenticated/projects/': typeof AuthenticatedProjectsIndexRoute
+  '/_authenticated/services-cms/': typeof AuthenticatedServicesCmsIndexRoute
   '/_authenticated/settings/': typeof AuthenticatedSettingsIndexRoute
+  '/_authenticated/subscribers/': typeof AuthenticatedSubscribersIndexRoute
   '/_authenticated/tasks/': typeof AuthenticatedTasksIndexRoute
+  '/_authenticated/testimonials-cms/': typeof AuthenticatedTestimonialsCmsIndexRoute
   '/_authenticated/testimonials/': typeof AuthenticatedTestimonialsIndexRoute
   '/_authenticated/users/': typeof AuthenticatedUsersIndexRoute
   '/_authenticated/blogs/$id/edit': typeof AuthenticatedBlogsIdEditRoute
@@ -424,16 +464,20 @@ export interface FileRouteTypes {
     | '/testimonials/create'
     | '/about-cms/'
     | '/apps/'
+    | '/blogs-cms/'
     | '/blogs/'
-    | '/categories/'
     | '/chats/'
+    | '/contact-cms/'
     | '/contact/'
     | '/help-center/'
     | '/home-cms/'
-    | '/products/'
+    | '/projects-cms/'
     | '/projects/'
+    | '/services-cms/'
     | '/settings/'
+    | '/subscribers/'
     | '/tasks/'
+    | '/testimonials-cms/'
     | '/testimonials/'
     | '/users/'
     | '/blogs/$id/edit'
@@ -464,16 +508,20 @@ export interface FileRouteTypes {
     | '/testimonials/create'
     | '/about-cms'
     | '/apps'
+    | '/blogs-cms'
     | '/blogs'
-    | '/categories'
     | '/chats'
+    | '/contact-cms'
     | '/contact'
     | '/help-center'
     | '/home-cms'
-    | '/products'
+    | '/projects-cms'
     | '/projects'
+    | '/services-cms'
     | '/settings'
+    | '/subscribers'
     | '/tasks'
+    | '/testimonials-cms'
     | '/testimonials'
     | '/users'
     | '/blogs/$id/edit'
@@ -506,16 +554,20 @@ export interface FileRouteTypes {
     | '/_authenticated/testimonials/create'
     | '/_authenticated/about-cms/'
     | '/_authenticated/apps/'
+    | '/_authenticated/blogs-cms/'
     | '/_authenticated/blogs/'
-    | '/_authenticated/categories/'
     | '/_authenticated/chats/'
+    | '/_authenticated/contact-cms/'
     | '/_authenticated/contact/'
     | '/_authenticated/help-center/'
     | '/_authenticated/home-cms/'
-    | '/_authenticated/products/'
+    | '/_authenticated/projects-cms/'
     | '/_authenticated/projects/'
+    | '/_authenticated/services-cms/'
     | '/_authenticated/settings/'
+    | '/_authenticated/subscribers/'
     | '/_authenticated/tasks/'
+    | '/_authenticated/testimonials-cms/'
     | '/_authenticated/testimonials/'
     | '/_authenticated/users/'
     | '/_authenticated/blogs/$id/edit'
@@ -644,6 +696,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAppsIndexRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/blogs-cms/': {
+      id: '/_authenticated/blogs-cms/'
+      path: '/blogs-cms'
+      fullPath: '/blogs-cms/'
+      preLoaderRoute: typeof AuthenticatedBlogsCmsIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/blogs/': {
       id: '/_authenticated/blogs/'
       path: '/blogs'
@@ -665,18 +724,18 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedBlogsCreateRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
-    '/_authenticated/categories/': {
-      id: '/_authenticated/categories/'
-      path: '/categories'
-      fullPath: '/categories/'
-      preLoaderRoute: typeof AuthenticatedCategoriesIndexRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
-    }
     '/_authenticated/chats/': {
       id: '/_authenticated/chats/'
       path: '/chats'
       fullPath: '/chats/'
       preLoaderRoute: typeof AuthenticatedChatsIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/contact-cms/': {
+      id: '/_authenticated/contact-cms/'
+      path: '/contact-cms'
+      fullPath: '/contact-cms/'
+      preLoaderRoute: typeof AuthenticatedContactCmsIndexRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/contact/': {
@@ -707,11 +766,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedHomeCmsIndexRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
-    '/_authenticated/products/': {
-      id: '/_authenticated/products/'
-      path: '/products'
-      fullPath: '/products/'
-      preLoaderRoute: typeof AuthenticatedProductsIndexRouteImport
+    '/_authenticated/projects-cms/': {
+      id: '/_authenticated/projects-cms/'
+      path: '/projects-cms'
+      fullPath: '/projects-cms/'
+      preLoaderRoute: typeof AuthenticatedProjectsCmsIndexRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/projects/': {
@@ -733,6 +792,13 @@ declare module '@tanstack/react-router' {
       path: '/projects/create'
       fullPath: '/projects/create'
       preLoaderRoute: typeof AuthenticatedProjectsCreateRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/services-cms/': {
+      id: '/_authenticated/services-cms/'
+      path: '/services-cms'
+      fullPath: '/services-cms/'
+      preLoaderRoute: typeof AuthenticatedServicesCmsIndexRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/settings/': {
@@ -770,11 +836,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedSettingsNotificationsRouteImport
       parentRoute: typeof AuthenticatedSettingsRouteRoute
     }
+    '/_authenticated/subscribers/': {
+      id: '/_authenticated/subscribers/'
+      path: '/subscribers'
+      fullPath: '/subscribers/'
+      preLoaderRoute: typeof AuthenticatedSubscribersIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/tasks/': {
       id: '/_authenticated/tasks/'
       path: '/tasks'
       fullPath: '/tasks/'
       preLoaderRoute: typeof AuthenticatedTasksIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/testimonials-cms/': {
+      id: '/_authenticated/testimonials-cms/'
+      path: '/testimonials-cms'
+      fullPath: '/testimonials-cms/'
+      preLoaderRoute: typeof AuthenticatedTestimonialsCmsIndexRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/testimonials/': {
@@ -856,15 +936,19 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedTestimonialsCreateRoute: typeof AuthenticatedTestimonialsCreateRoute
   AuthenticatedAboutCmsIndexRoute: typeof AuthenticatedAboutCmsIndexRoute
   AuthenticatedAppsIndexRoute: typeof AuthenticatedAppsIndexRoute
+  AuthenticatedBlogsCmsIndexRoute: typeof AuthenticatedBlogsCmsIndexRoute
   AuthenticatedBlogsIndexRoute: typeof AuthenticatedBlogsIndexRoute
-  AuthenticatedCategoriesIndexRoute: typeof AuthenticatedCategoriesIndexRoute
   AuthenticatedChatsIndexRoute: typeof AuthenticatedChatsIndexRoute
+  AuthenticatedContactCmsIndexRoute: typeof AuthenticatedContactCmsIndexRoute
   AuthenticatedContactIndexRoute: typeof AuthenticatedContactIndexRoute
   AuthenticatedHelpCenterIndexRoute: typeof AuthenticatedHelpCenterIndexRoute
   AuthenticatedHomeCmsIndexRoute: typeof AuthenticatedHomeCmsIndexRoute
-  AuthenticatedProductsIndexRoute: typeof AuthenticatedProductsIndexRoute
+  AuthenticatedProjectsCmsIndexRoute: typeof AuthenticatedProjectsCmsIndexRoute
   AuthenticatedProjectsIndexRoute: typeof AuthenticatedProjectsIndexRoute
+  AuthenticatedServicesCmsIndexRoute: typeof AuthenticatedServicesCmsIndexRoute
+  AuthenticatedSubscribersIndexRoute: typeof AuthenticatedSubscribersIndexRoute
   AuthenticatedTasksIndexRoute: typeof AuthenticatedTasksIndexRoute
+  AuthenticatedTestimonialsCmsIndexRoute: typeof AuthenticatedTestimonialsCmsIndexRoute
   AuthenticatedTestimonialsIndexRoute: typeof AuthenticatedTestimonialsIndexRoute
   AuthenticatedUsersIndexRoute: typeof AuthenticatedUsersIndexRoute
   AuthenticatedBlogsIdEditRoute: typeof AuthenticatedBlogsIdEditRoute
@@ -883,15 +967,20 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedTestimonialsCreateRoute: AuthenticatedTestimonialsCreateRoute,
   AuthenticatedAboutCmsIndexRoute: AuthenticatedAboutCmsIndexRoute,
   AuthenticatedAppsIndexRoute: AuthenticatedAppsIndexRoute,
+  AuthenticatedBlogsCmsIndexRoute: AuthenticatedBlogsCmsIndexRoute,
   AuthenticatedBlogsIndexRoute: AuthenticatedBlogsIndexRoute,
-  AuthenticatedCategoriesIndexRoute: AuthenticatedCategoriesIndexRoute,
   AuthenticatedChatsIndexRoute: AuthenticatedChatsIndexRoute,
+  AuthenticatedContactCmsIndexRoute: AuthenticatedContactCmsIndexRoute,
   AuthenticatedContactIndexRoute: AuthenticatedContactIndexRoute,
   AuthenticatedHelpCenterIndexRoute: AuthenticatedHelpCenterIndexRoute,
   AuthenticatedHomeCmsIndexRoute: AuthenticatedHomeCmsIndexRoute,
-  AuthenticatedProductsIndexRoute: AuthenticatedProductsIndexRoute,
+  AuthenticatedProjectsCmsIndexRoute: AuthenticatedProjectsCmsIndexRoute,
   AuthenticatedProjectsIndexRoute: AuthenticatedProjectsIndexRoute,
+  AuthenticatedServicesCmsIndexRoute: AuthenticatedServicesCmsIndexRoute,
+  AuthenticatedSubscribersIndexRoute: AuthenticatedSubscribersIndexRoute,
   AuthenticatedTasksIndexRoute: AuthenticatedTasksIndexRoute,
+  AuthenticatedTestimonialsCmsIndexRoute:
+    AuthenticatedTestimonialsCmsIndexRoute,
   AuthenticatedTestimonialsIndexRoute: AuthenticatedTestimonialsIndexRoute,
   AuthenticatedUsersIndexRoute: AuthenticatedUsersIndexRoute,
   AuthenticatedBlogsIdEditRoute: AuthenticatedBlogsIdEditRoute,

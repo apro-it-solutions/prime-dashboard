@@ -1,8 +1,5 @@
 import { Link } from '@tanstack/react-router'
 import { Logo } from '@/assets/logo'
-import { cn } from '@/lib/utils'
-import dashboardDark from './assets/dashboard-dark.png'
-import dashboardLight from './assets/dashboard-light.png'
 import { UserAuthForm } from './components/user-auth-form'
 
 export function SignIn2() {
@@ -11,8 +8,7 @@ export function SignIn2() {
       <div className='lg:p-8'>
         <div className='mx-auto flex w-full flex-col justify-center space-y-2 py-8 sm:w-120 sm:p-8'>
           <div className='mb-4 flex items-center justify-center'>
-            <Logo className='me-2' />
-            <h1 className='text-xl font-medium'>Prime</h1>
+            <Logo className='h-14' />
           </div>
         </div>
         <div className='mx-auto flex w-full max-w-sm flex-col justify-center space-y-2'>
@@ -51,26 +47,9 @@ export function SignIn2() {
         </div>
       </div>
 
-      <div
-        className={cn(
-          'relative h-full overflow-hidden bg-muted max-lg:hidden',
-          '[&>img]:absolute [&>img]:top-[15%] [&>img]:left-20 [&>img]:h-full [&>img]:w-full [&>img]:object-cover [&>img]:object-top-left [&>img]:select-none'
-        )}
-      >
-        <img
-          src={dashboardLight}
-          className='dark:hidden'
-          width={1024}
-          height={1151}
-          alt='Prime'
-        />
-        <img
-          src={dashboardDark}
-          className='hidden dark:block'
-          width={1024}
-          height={1138}
-          alt='Prime'
-        />
+      <div className='relative hidden h-full items-center justify-center overflow-hidden bg-muted lg:flex'>
+        <div className='absolute inset-0 bg-[radial-gradient(circle_at_50%_40%,rgba(40,142,73,0.12),transparent_62%)]' />
+        <Logo className='relative h-40 w-auto' />
       </div>
     </div>
   )

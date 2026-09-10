@@ -24,6 +24,7 @@ export const blogFormSchema = z.object({
   featuredImage: z.string().optional(),
   gallery: z.array(z.string()),
   category: z.string().min(1, 'Please select a category'),
+  authorName: z.string().max(120, 'Author name is too long').optional(),
   tags: z.string().optional(),
   isFeatured: z.boolean(),
   status: z.enum(['draft', 'published', 'archived']),
@@ -41,6 +42,7 @@ export const emptyBlogForm: BlogFormValues = {
   featuredImage: '',
   gallery: [],
   category: '',
+  authorName: '',
   tags: '',
   isFeatured: false,
   status: 'draft',
@@ -71,6 +73,7 @@ export function blogToForm(blog: Blog): BlogFormValues {
     featuredImage: blog.featuredImage ?? '',
     gallery: blog.gallery ?? [],
     category: categoryId(blog.category),
+    authorName: blog.authorName ?? '',
     tags: (blog.tags ?? []).join(', '),
     isFeatured: blog.isFeatured ?? false,
     status: blog.status,
@@ -95,6 +98,9 @@ export function formToInput(
     featuredImage: values.featuredImage || undefined,
     gallery: values.gallery ?? [],
     category: values.category,
+    // Sent even when blank so clearing the field resets the post to the
+    // account byline; `undefined` would be dropped from the JSON body.
+    authorName: values.authorName?.trim() ?? '',
     tags: values.tags
       ? values.tags
           .split(',')

@@ -11,6 +11,7 @@ import {
   TableRow,
 } from '@/components/ui/table'
 import { DataError, DataLoading, EmptyRow } from '@/features/shared/data-states'
+import { resolveImageUrl } from '@/lib/image-url'
 import { ProjectStatusBadge } from './project-status-badge'
 
 const COL_SPAN = 9
@@ -69,7 +70,7 @@ export function ProjectTable({
                 <TableCell>
                   {project.featuredImage ? (
                     <img
-                      src={project.featuredImage}
+                      src={resolveImageUrl(project.featuredImage)}
                       alt={project.title}
                       className='size-10 rounded object-cover'
                     />

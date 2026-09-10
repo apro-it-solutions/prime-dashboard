@@ -36,6 +36,7 @@ import { TestimonialRating } from '@/components/dashboard/testimonials/testimoni
 import { TestimonialSearch } from '@/components/dashboard/testimonials/testimonial-search'
 import { TestimonialStatusBadge } from '@/components/dashboard/testimonials/testimonial-status-badge'
 import { TestimonialTable } from '@/components/dashboard/testimonials/testimonial-table'
+import { resolveImageUrl } from '@/lib/image-url'
 
 const PAGE_SIZE = 10
 
@@ -157,7 +158,6 @@ export function Testimonials() {
             <DialogTitle>{viewing?.name}</DialogTitle>
             <DialogDescription>
               {viewing?.designation}
-              {viewing?.company ? ` · ${viewing.company}` : ''}
               {viewing?.createdAt
                 ? ` · ${format(new Date(viewing.createdAt), 'PP')}`
                 : ''}
@@ -168,7 +168,7 @@ export function Testimonials() {
               <div className='flex items-center gap-3'>
                 <Avatar className='size-12'>
                   <AvatarImage
-                    src={viewing.avatar}
+                    src={resolveImageUrl(viewing.avatar)}
                     alt={viewing.name}
                     className='object-cover'
                   />

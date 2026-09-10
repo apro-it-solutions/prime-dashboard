@@ -5,7 +5,7 @@ type TestimonialSearchProps = {
   className?: string
 }
 
-/** Debounced search box for the testimonial list (name, company). */
+/** Debounced search box for the testimonial list (name). */
 export function TestimonialSearch({ onChange, className }: TestimonialSearchProps) {
   return (
     <SearchInput

@@ -95,25 +95,6 @@ export function TestimonialForm({
 
           <FormField
             control={form.control}
-            name='company'
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Company</FormLabel>
-                <FormControl>
-                  <Input
-                    placeholder='Company name'
-                    {...field}
-                    value={field.value ?? ''}
-                  />
-                </FormControl>
-                <FormDescription>Optional.</FormDescription>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-
-          <FormField
-            control={form.control}
             name='review'
             render={({ field }) => (
               <FormItem>

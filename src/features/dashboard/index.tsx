@@ -1,13 +1,6 @@
 import { Link } from '@tanstack/react-router'
 import { format } from 'date-fns'
-import {
-  Package,
-  Newspaper,
-  FolderTree,
-  Inbox,
-  Mail,
-  CheckCircle2,
-} from 'lucide-react'
+import { Newspaper, Inbox, Mail, CheckCircle2 } from 'lucide-react'
 import { useDashboard } from '@/hooks/use-dashboard'
 import {
   Card,
@@ -32,22 +25,10 @@ export function Dashboard() {
 
   const cards = [
     {
-      title: 'Total Products',
-      value: counts?.totalProducts,
-      hint: `${counts?.publishedProducts ?? 0} published`,
-      icon: Package,
-    },
-    {
       title: 'Total Blogs',
       value: counts?.totalBlogs,
       hint: `${counts?.publishedBlogs ?? 0} published`,
       icon: Newspaper,
-    },
-    {
-      title: 'Categories',
-      value: counts?.totalCategories,
-      hint: 'Product & blog categories',
-      icon: FolderTree,
     },
     {
       title: 'Messages',
@@ -92,7 +73,7 @@ export function Dashboard() {
           </Card>
         ) : (
           <>
-            <div className='grid gap-4 sm:grid-cols-2 lg:grid-cols-4'>
+            <div className='grid gap-4 sm:grid-cols-2'>
               {cards.map((card) => (
                 <Card key={card.title}>
                   <CardHeader className='flex flex-row items-center justify-between space-y-0 pb-2'>

@@ -2,6 +2,7 @@ import { useRef, type ChangeEvent } from 'react'
 import { ImagePlus, Loader2, X } from 'lucide-react'
 import { useUploadImages } from '@/hooks/use-upload'
 import { cn } from '@/lib/utils'
+import { resolveImageUrl } from '@/lib/image-url'
 
 type GalleryUploadProps = {
   /** Current list of image URLs (controlled). */
@@ -56,7 +57,7 @@ export function GalleryUpload({
             key={`${url}-${index}`}
             className='group relative aspect-square overflow-hidden rounded-md border'
           >
-            <img src={url} alt='' className='h-full w-full object-cover' />
+            <img src={resolveImageUrl(url)} alt='' className='h-full w-full object-cover' />
             <button
               type='button'
               disabled={isBusy}

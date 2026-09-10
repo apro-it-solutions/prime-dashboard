@@ -11,12 +11,18 @@ import {
   TableRow,
 } from '@/components/ui/table'
 import { DataError, DataLoading, EmptyRow } from '@/features/shared/data-states'
+import { resolveImageUrl } from '@/lib/image-url'
 import { BlogStatusBadge } from './blog-status-badge'
 
 const COL_SPAN = 8
 
-const authorName = (author: Blog['author']): string =>
-  author && typeof author === 'object' ? author.name : '—'
+/** Custom CMS byline when set, otherwise the account that created the post. */
+const authorName = (blog: Blog): string => {
+  const custom = blog.authorName?.trim()
+  if (custom) return custom
+  const author = blog.author
+  return author && typeof author === 'object' ? author.name : '—'
+}
 const categoryName = (category: Blog['category']): string =>
   category && typeof category === 'object' ? category.name : '—'
 const fmtDate = (value?: string): string =>
@@ -70,7 +76,7 @@ export function BlogTable({
                 <TableCell>
                   {blog.featuredImage ? (
                     <img
-                      src={blog.featuredImage}
+                      src={resolveImageUrl(blog.featuredImage)}
                       alt={blog.title}
                       className='size-10 rounded object-cover'
                     />
@@ -95,7 +101,7 @@ export function BlogTable({
                   {categoryName(blog.category)}
                 </TableCell>
                 <TableCell className='text-muted-foreground'>
-                  {authorName(blog.author)}
+                  {authorName(blog)}
                 </TableCell>
                 <TableCell>
                   <BlogStatusBadge status={blog.status} />

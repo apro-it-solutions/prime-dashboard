@@ -1,24 +1,42 @@
-import { type SVGProps } from 'react'
+import { type ImgHTMLAttributes } from 'react'
 import { cn } from '@/lib/utils'
+import primeLogoMark from './prime-logo-mark.svg'
+import primeLogo from './prime-logo.svg'
 
-export function Logo({ className, ...props }: SVGProps<SVGSVGElement>) {
+type LogoProps = Omit<ImgHTMLAttributes<HTMLImageElement>, 'src' | 'alt'> & {
+  alt?: string
+}
+
+/**
+ * The full Prime NMS lockup — oval mark with the wordmark and strapline
+ * beneath it. Roughly 1.67:1, so size it by height and let the width follow.
+ */
+export function Logo({ className, alt = 'Prime NMS', ...props }: LogoProps) {
   return (
-    <svg
-      id='prime-logo'
-      viewBox='0 0 24 24'
-      xmlns='http://www.w3.org/2000/svg'
-      height='24'
-      width='24'
-      fill='none'
-      stroke='currentColor'
-      strokeWidth='2'
-      strokeLinecap='round'
-      strokeLinejoin='round'
-      className={cn('size-6', className)}
+    <img
+      src={primeLogo}
+      alt={alt}
+      className={cn('h-10 w-auto', className)}
       {...props}
-    >
-      <title>Prime</title>
-      <path d='M15 6v12a3 3 0 1 0 3-3H6a3 3 0 1 0 3 3V6a3 3 0 1 0-3 3h12a3 3 0 1 0-3-3' />
-    </svg>
+    />
+  )
+}
+
+/**
+ * The oval mark on its own (strapline cropped away). Use where the lockup has
+ * to sit in a small or square slot, such as the sidebar rail.
+ */
+export function LogoMark({
+  className,
+  alt = 'Prime NMS',
+  ...props
+}: LogoProps) {
+  return (
+    <img
+      src={primeLogoMark}
+      alt={alt}
+      className={cn('h-6 w-auto', className)}
+      {...props}
+    />
   )
 }

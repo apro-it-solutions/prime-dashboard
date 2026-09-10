@@ -57,17 +57,44 @@ export interface ListQuery {
 
 // ----- Auth -----
 
-export type UserRole = 'admin' | 'editor' | string
+// The role/permission model lives in @/lib/rbac (mirroring the backend) and is
+// re-exported here so the many modules that already import from '@/types/api'
+// keep one import path.
+import type { Permission, UserRole } from '@/lib/rbac'
 
 export interface AuthUser {
   _id: string
   name: string
   email: string
   role: UserRole
+  /**
+   * The permissions the server resolved for this account. Sent by every
+   * /auth endpoint; absent only on a response from a backend that predates
+   * RBAC, where the dashboard falls back to its own role map.
+   */
+  permissions?: Permission[]
   isActive: boolean
   lastLogin?: string
   createdAt: string
   updatedAt: string
+}
+
+// ----- Admin users (Users module) -----
+
+/** An account as returned by /users. Same shape as AuthUser. */
+export type AdminUser = AuthUser
+
+export interface AdminUserInput {
+  name: string
+  email: string
+  /** Required on create; omit on update to leave the current password alone. */
+  password?: string
+  role: UserRole
+  isActive?: boolean
+}
+
+export interface AdminUserListQuery extends ListQuery {
+  role?: UserRole
 }
 
 export interface LoginResponse {
@@ -91,35 +118,49 @@ export interface UploadedFile {
 // ----- SEO (embedded) -----
 
 export interface SeoMeta {
+  /** SEO title — the <title> tag and og:title fallback. */
   metaTitle?: string
   metaDescription?: string
   metaKeywords?: string[]
-  ogImage?: string
   canonicalUrl?: string
+  /** Open Graph overrides; fall back to metaTitle / metaDescription when empty. */
+  ogTitle?: string
+  ogDescription?: string
+  /** Absolute URL of the uploaded OG image, served by the API from /uploads. */
+  ogImage?: string
+}
+
+// ----- Page SEO -----
+
+/**
+ * Website pages whose SEO lives in the standalone /page-seo collection.
+ *
+ * Home and About are absent on purpose: their SEO is already stored on their
+ * own CMS documents and is saved through /home and /about. Individual blogs,
+ * projects and products likewise keep their own embedded SEO on their own edit
+ * screens. Keeping this list narrow means one source of truth per page.
+ *
+ * Must stay in step with PAGE_SEO_KEYS in the backend's src/constants/index.ts.
+ */
+export type PageSeoKey =
+  'services' | 'projects' | 'blogs' | 'testimonials' | 'contact'
+
+/** One /page-seo record. The API creates it empty on first read. */
+export interface PageSeo {
+  _id?: string
+  page: PageSeoKey
+  seo: SeoMeta
+  createdAt?: string
+  updatedAt?: string
+}
+
+export interface PageSeoInput {
+  seo: SeoMeta
 }
 
 // ----- Category -----
 
-export interface Category {
-  _id: string
-  name: string
-  slug: string
-  description?: string
-  status: CategoryStatus
-  /** Number of products referencing this category (attached by the list endpoint). */
-  productCount?: number
-  createdAt: string
-  updatedAt: string
-}
-
-export interface CategoryInput {
-  name: string
-  slug?: string
-  description?: string
-  status?: CategoryStatus
-}
-
-/** Category as populated inside product/project/blog list responses. */
+/** Category as populated inside project and blog list responses. */
 export interface CategoryRef {
   _id: string
   name: string
@@ -174,37 +215,6 @@ export interface BlogCategoryInput {
   slug?: string
   description?: string
   status?: CategoryStatus
-}
-
-// ----- Product -----
-
-export interface Product {
-  _id: string
-  title: string
-  slug: string
-  description: string
-  shortDescription?: string
-  category: CategoryRef | string | null
-  featuredImage?: string
-  gallery: string[]
-  status: ContentStatus
-  featured: boolean
-  seo?: SeoMeta
-  createdAt: string
-  updatedAt: string
-}
-
-export interface ProductInput {
-  title: string
-  slug?: string
-  description: string
-  shortDescription?: string
-  category: string
-  featuredImage?: string
-  gallery?: string[]
-  status?: ContentStatus
-  featured?: boolean
-  seo?: SeoMeta
 }
 
 // ----- Project -----
@@ -269,6 +279,11 @@ export interface Blog {
   category: CategoryRef | string | null
   tags: string[]
   author: AuthorRef | string | null
+  /**
+   * Custom byline entered in the CMS. Empty on posts created before the field
+   * existed, where readers fall back to `author`.
+   */
+  authorName?: string
   isFeatured: boolean
   readingTime: number
   status: ContentStatus
@@ -286,6 +301,7 @@ export interface BlogInput {
   featuredImage?: string
   gallery?: string[]
   category: string
+  authorName?: string
   tags?: string[]
   isFeatured?: boolean
   status?: ContentStatus
@@ -299,7 +315,6 @@ export interface Testimonial {
   _id: string
   name: string
   designation: string
-  company?: string
   avatar?: string
   rating: number
   review: string
@@ -311,20 +326,52 @@ export interface Testimonial {
 export interface TestimonialInput {
   name: string
   designation: string
-  company?: string
   avatar?: string
   rating: number
   review: string
   isActive?: boolean
 }
 
+// ----- Newsletter subscribers -----
+
+/** A subscriber is suppressed rather than deleted when they opt out. */
+export type SubscriberStatus = 'subscribed' | 'unsubscribed'
+
+/**
+ * One newsletter sign-up, as stored by the backend.
+ *
+ * One row per address across every sign-up form on the website — the home page
+ * and the blog write to the same list — so an address entered on both is a
+ * single subscriber and a single unsubscribe. `status` is a suppression flag
+ * rather than a delete: an address that opts out keeps its row, and signing up
+ * again flips the same record back instead of creating a second one, which is
+ * why `createdAt` is the date the address *first* subscribed.
+ */
+export interface Subscriber {
+  _id: string
+  email: string
+  status: SubscriberStatus
+  createdAt: string
+  updatedAt: string
+}
+
 // ----- Contact -----
 
+/**
+ * One "Request a Quote" submission, as stored by the backend.
+ *
+ * `company` and `projectType` are optional because submissions taken before
+ * they had columns of their own carry both folded into `subject` instead
+ * (e.g. "Warehouse — Acme Corp"), which is why the inbox falls back to it.
+ */
 export interface ContactMessage {
   _id: string
   name: string
+  company?: string
   email: string
   phone?: string
+  projectType?: string
+  /** Summary line; derived from projectType and company when not supplied. */
   subject?: string
   message: string
   isRead: boolean

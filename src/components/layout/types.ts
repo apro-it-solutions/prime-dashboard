@@ -1,4 +1,5 @@
 import { type LinkProps } from '@tanstack/react-router'
+import { type Permission } from '@/lib/rbac'
 
 type User = {
   name: string
@@ -16,6 +17,12 @@ type BaseNavItem = {
   title: string
   badge?: string
   icon?: React.ElementType
+  /**
+   * Permissions the signed-in admin must hold for this entry to appear.
+   * Omitted means "visible to anyone signed in". A collapsible's children may
+   * narrow further; a group whose items all fall away is dropped with them.
+   */
+  permissions?: Permission[]
 }
 
 type NavLink = BaseNavItem & {

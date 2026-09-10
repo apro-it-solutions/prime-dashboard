@@ -38,7 +38,7 @@ import {
 
 type BlogFormProps = {
   defaultValues: BlogFormValues
-  /** Blog-only categories. Never the product or project categories. */
+  /** Blog-only categories. Never the project categories. */
   categories: BlogCategory[]
   isSubmitting: boolean
   mode: 'create' | 'edit'
@@ -284,7 +284,7 @@ export function BlogForm({
                 <FormDescription>
                   {categories.length === 0
                     ? 'No blog categories yet. Add the first one with +.'
-                    : 'Blog categories only — separate from product categories.'}
+                    : 'Blog categories only — separate from project categories.'}
                 </FormDescription>
                 <FormMessage />
 
@@ -293,6 +293,28 @@ export function BlogForm({
                   onOpenChange={setCategoryDialogOpen}
                   onCreated={(category) => field.onChange(category._id)}
                 />
+              </FormItem>
+            )}
+          />
+
+          <FormField
+            control={form.control}
+            name='authorName'
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Author name</FormLabel>
+                <FormControl>
+                  <Input
+                    placeholder='Prime NMS'
+                    {...field}
+                    value={field.value ?? ''}
+                  />
+                </FormControl>
+                <FormDescription>
+                  Byline shown on the public post. Leave blank to use your
+                  account name.
+                </FormDescription>
+                <FormMessage />
               </FormItem>
             )}
           />

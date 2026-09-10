@@ -3,6 +3,7 @@ import { ImagePlus, Loader2, X } from 'lucide-react'
 import { useUploadImage } from '@/hooks/use-upload'
 import { cn } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
+import { resolveImageUrl } from '@/lib/image-url'
 
 type ImageUploadProps = {
   /** Current image URL (controlled). */
@@ -52,7 +53,7 @@ export function ImageUpload({
       {value ? (
         <div className='group relative w-full overflow-hidden rounded-md border'>
           <img
-            src={value}
+            src={resolveImageUrl(value)}
             alt='Uploaded preview'
             className='h-40 w-full object-cover'
           />

@@ -15,7 +15,7 @@ export const FEATURED_ALL = 'all'
 export type ProjectSort = 'order' | 'latest' | 'oldest' | 'title'
 
 type ProjectFiltersProps = {
-  /** Project-only categories, not the shared product/blog ones. */
+  /** Project-only categories, not the blog ones. */
   categories: ProjectCategory[]
   status: string
   category: string

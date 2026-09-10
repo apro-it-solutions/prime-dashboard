@@ -1,6 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { useNavigate } from '@tanstack/react-router'
 import { toast } from 'sonner'
+import { isNetworkError } from '@/lib/api-client'
 import {
   authService,
   type LoginCredentials,
@@ -63,7 +64,15 @@ export function useLogin(redirectTo?: string) {
 
 /**
  * GET /auth/me — hydrates the signed-in admin.
- * Only runs when an access token is present. Keeps the auth store user in sync.
+ *
+ * Runs once per session and only when an access token is present: `enabled`
+ * gates it on the token and the 5 minute `staleTime` keeps remounts and window
+ * focus from re-firing it, so this never becomes a polling loop.
+ *
+ * A rejected token (401/403) must not be retried — the axios interceptor already
+ * attempts a single refresh, and retrying past that would hammer the API while
+ * the session is dead. One retry is allowed for a genuine network failure
+ * (timeout/DNS/offline) so a brief blip does not strand the dashboard.
  */
 export function useMe() {
   const accessToken = useAuthStore((s) => s.auth.accessToken)
@@ -78,7 +87,8 @@ export function useMe() {
     },
     enabled: Boolean(accessToken),
     staleTime: 5 * 60 * 1000,
-    retry: false,
+    retry: (failureCount, error) => failureCount < 1 && isNetworkError(error),
+    retryDelay: 1000,
   })
 }
 

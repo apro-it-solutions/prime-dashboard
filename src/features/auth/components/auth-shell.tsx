@@ -1,7 +1,7 @@
+import primeLogo from '@/assets/prime-logo.svg'
 import { cn } from '@/lib/utils'
 import authBackdrop from '../assets/auth-backdrop.jpg'
 import lightGlow from '../assets/light-glow.svg'
-import primeLogo from '../assets/prime-logo.png'
 
 /** Artboard the Figma coordinates below are relative to. */
 const ARTBOARD_WIDTH = 1920
@@ -67,15 +67,11 @@ export function AuthShell({
         )}
       >
         <header className='flex w-full flex-col items-center gap-[16px]'>
-          {/* The logo art carries a strapline below the mark; the design crops it
-              out by clipping the frame to the oval. */}
-          <div className='relative h-[52px] w-[134px] overflow-hidden sm:h-[58px] sm:w-[149px]'>
-            <img
-              src={primeLogo}
-              alt='Prime'
-              className='absolute start-0 top-0 h-[119.59%] w-[100.16%] max-w-none'
-            />
-          </div>
+          <img
+            src={primeLogo}
+            alt='Prime NMS'
+            className='h-[62px] w-auto sm:h-[70px]'
+          />
 
           <div className='flex flex-col items-center gap-[6px]'>
             <h1 className='text-[22px] font-bold text-[#1a1d24] sm:text-[24px]'>

@@ -33,6 +33,7 @@ import { Main } from '@/components/layout/main'
 import { ProfileDropdown } from '@/components/profile-dropdown'
 import { Search } from '@/components/search'
 import { ThemeSwitch } from '@/components/theme-switch'
+import { resolveImageUrl } from '@/lib/image-url'
 
 const PAGE_SIZE = 10
 
@@ -187,7 +188,7 @@ export function Projects() {
             <div className='space-y-4'>
               {viewing.featuredImage && (
                 <img
-                  src={viewing.featuredImage}
+                  src={resolveImageUrl(viewing.featuredImage)}
                   alt={viewing.title}
                   className='h-48 w-full rounded-md border object-cover'
                 />
@@ -217,7 +218,7 @@ export function Projects() {
                   {viewing.gallery.map((url) => (
                     <img
                       key={url}
-                      src={url}
+                      src={resolveImageUrl(url)}
                       alt=''
                       className='aspect-square w-full rounded-md border object-cover'
                     />

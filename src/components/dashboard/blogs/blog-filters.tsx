@@ -12,7 +12,7 @@ export const CATEGORY_ALL = 'all'
 export type BlogSort = 'latest' | 'oldest'
 
 type BlogFiltersProps = {
-  /** Blog-only categories, not the product or project ones. */
+  /** Blog-only categories, not the project ones. */
   categories: BlogCategory[]
   status: string
   category: string

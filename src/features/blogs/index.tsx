@@ -32,6 +32,7 @@ import { BlogSearch } from '@/components/dashboard/blogs/blog-search'
 import { BlogStatusBadge } from '@/components/dashboard/blogs/blog-status-badge'
 import { BlogTable } from '@/components/dashboard/blogs/blog-table'
 import { DeleteBlogDialog } from '@/components/dashboard/blogs/delete-blog-dialog'
+import { resolveImageUrl } from '@/lib/image-url'
 
 const PAGE_SIZE = 10
 
@@ -161,7 +162,7 @@ export function Blogs() {
             <div className='space-y-4'>
               {viewing.featuredImage && (
                 <img
-                  src={viewing.featuredImage}
+                  src={resolveImageUrl(viewing.featuredImage)}
                   alt={viewing.title}
                   className='h-48 w-full rounded-md border object-cover'
                 />

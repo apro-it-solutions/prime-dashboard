@@ -12,7 +12,6 @@ export const RATING_OPTIONS = ['1', '2', '3', '4', '5'] as const
 export const testimonialFormSchema = z.object({
   name: z.string().min(2, 'Name must be at least 2 characters').max(120),
   designation: z.string().min(1, 'Designation is required').max(120),
-  company: z.string().max(150).optional(),
   avatar: z.string().optional(),
   rating: z.enum(RATING_OPTIONS),
   review: z
@@ -27,7 +26,6 @@ export type TestimonialFormValues = z.infer<typeof testimonialFormSchema>
 export const emptyTestimonialForm: TestimonialFormValues = {
   name: '',
   designation: '',
-  company: '',
   avatar: '',
   rating: '5',
   review: '',
@@ -47,7 +45,6 @@ export function testimonialToForm(
   return {
     name: testimonial.name,
     designation: testimonial.designation,
-    company: testimonial.company ?? '',
     avatar: testimonial.avatar ?? '',
     rating: toRatingOption(testimonial.rating),
     review: testimonial.review,
@@ -60,7 +57,6 @@ export function formToInput(values: TestimonialFormValues): TestimonialInput {
   return {
     name: values.name.trim(),
     designation: values.designation.trim(),
-    company: values.company?.trim() || undefined,
     avatar: values.avatar || undefined,
     rating: Number(values.rating),
     review: values.review.trim(),

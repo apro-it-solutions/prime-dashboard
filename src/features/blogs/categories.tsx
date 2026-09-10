@@ -32,8 +32,7 @@ const PAGE_SIZE = 10
 
 /**
  * Blog category management, scoped to the Blogs section. These categories live
- * in their own collection and are never shared with the product categories on
- * the Categories page or with project categories.
+ * in their own collection and are never shared with project categories.
  */
 export function BlogCategories() {
   const [page, setPage] = useState(1)
